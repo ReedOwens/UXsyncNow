@@ -123,7 +123,7 @@ export class NowFile {
                         serverCRC: this.crc,
                         clientCRC: this.crc,
                         serverSync: now ? now : -1,
-                        clientSync: new Date(stats.mtime).getTime()
+                        clientSync: new Date(stats.mtime + '').getTime()
                     });
 
                     mode.filesReceived++;
@@ -291,7 +291,7 @@ export class NowFile {
                                     serverCRC: this.crc,
                                     clientCRC: this.crc,
                                     serverSync: parseInt(result.now, 10),
-                                    clientSync: new Date(stats.mtime).getTime()
+                                    clientSync: new Date(stats.mtime+'').getTime()
                                 });
                                 Notify.message(
                                     `${path.basename(this._fileName)}`,
@@ -331,7 +331,7 @@ export class NowFile {
                             serverCRC: this.crc,
                             clientCRC: this.crc,
                             serverSync: parseInt(results.now, 10),
-                            clientSync: new Date(stats.mtime).getTime()
+                            clientSync: new Date(stats.mtime + '').getTime()
                         });
                         Notify.message(
                             `${path.basename(this._fileName)}`,

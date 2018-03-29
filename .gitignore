@@ -21,3 +21,4 @@ build
 test*/
 old/
 uxsyncnow-config-*.json
+.uxsyncnow*
