@@ -1,0 +1,38 @@
+GET http://{{host}}/api/global/uxsyncnow/getApplications
+Accept: */*
+Cache-Control: no-cache
+Authorization: Basic {{username}} {{password}}
+
+###
+GET http://{{host}}/api/global/uxsyncnow/getApplications
+Accept: */*
+Cache-Control: no-cache
+Authorization: Basic {{username}} {{password}}
+
+> {%
+client.test("Result option exists", function() {
+  client.assert(response.body.hasOwnProperty("result"), "Cannot find result option in response");
+});
+
+client.test("Did we get apps", function() {
+      var apps = response.body.result;
+      client.assert(apps.length >0 , "No applications found");
+});
+
+client.test("Apps have all keys", function() {
+      var apps = response.body.result;
+      var app = apps.shift();
+        client.assert(app.hasOwnProperty("name"), "App is missing name");
+        client.assert(app.hasOwnProperty("active"), "App is missing active");
+        client.assert(app.hasOwnProperty("scope"), "App is missing sys_id");
+        client.assert(app.hasOwnProperty("short_description"), "App is missing short_description");
+        client.assert(app.hasOwnProperty("version"), "App is missing version");
+
+      client.assert(apps.length >0 , "No applications found");
+});
+
+%}
+
+###
+
+

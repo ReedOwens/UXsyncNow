@@ -1,0 +1,23 @@
+#OS junk files
+[Tt]humbs.db
+*.DS_Store
+.*
+node_modules/*
+!.gitignore
+npm-debug.log
+docs
+wijmo-amd-src
+wijmo-amd-min
+src/**/*.js
+src/**/*.map
+dist
+
+typings
+.sync_data
+
+*.log
+*.lock
+build
+test*/
+old/
+uxsyncnow-config-*.json

@@ -1,0 +1,54 @@
+{
+  "name": "uxsyncnow",
+  "version": "1.0.0",
+  "description": "UXstorm's ServiceNow development sync",
+  "main": "uxsyncnow.js",
+  "scripts": {
+    "test": "karma start",
+    "preinstall": "echo 'Installing' && tsc && (echo '#!/usr/bin/env node' >dist/uxsyncnowcli && cat dist/uxsyncnow.js >> dist/uxsyncnowcli)"
+  },
+  "bin": {
+    "uxsyncnow": "dist/uxsyncnowcli"
+  },
+  "keywords": ["servicenow","uxstorm","filesync","sync"],
+  "author": "UXstorm",
+  "license": "AGPL-3.0+",
+  "devDependencies": {
+    "@types/bluebird": "^3.5.16",
+    "@types/jsonfile": "^4.0.0",
+    "@types/node": "^8.0.53",
+    "bluebird": "^3.5.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-ts": "^6.0.0-beta.15",
+    "jsonfile": "^4.0.0",
+    "lodash": "^4.17.4",
+    "typescript": "^2.3.2",
+    "typings": "^2.1.1",
+    "vorpal": "^1.12.0",
+    "chokidar": "^2.0.2",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "bottleneck": "^1.16.0",
+    "node-notifier": "^5.2.1",
+    "unirest": "^0.5.1",
+    "vorpal-log": "^1.1.0"
+  },
+  "dependencies": {
+    "@types/chokidar": "^1.7.5",
+    "@types/jasmine": "^2.8.2",
+    "@types/lodash": "^4.14.77",
+    "@types/minimist": "^1.2.0",
+    "@types/mkdirp": "^0.5.1",
+    "@types/node-notifier": "^0.0.28",
+    "grunt": "^1.0.1",
+    "jasmine": "^2.8.0",
+    "jasmine-core": "^2.8.0",
+    "jasmine-node": "^1.14.5",
+    "karma": "^1.7.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-typescript": "^3.0.8",
+    "phantomjs": "^2.1.7"
+  }
+}
