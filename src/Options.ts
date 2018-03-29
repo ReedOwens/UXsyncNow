@@ -6,11 +6,11 @@ import * as path from "path";
 export class Options {
     private static singleton: Options = null;
     private options: any = {
-        host: "uxstormdev5.service-now.com",
-        protocol: "http",
+        host: "",
+        protocol: "https",
         port: 0,
-        user: "resttest",
-        password: "abc123",
+        user: "",
+        password: "",
         applications: [],
         app: "",
         app_sys_id: "",
