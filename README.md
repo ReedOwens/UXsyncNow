@@ -1,4 +1,4 @@
-#UXsyncNow#
+# UXsyncNow
 
 ## PRE-RELEASE
 
