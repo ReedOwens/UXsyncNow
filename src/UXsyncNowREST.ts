@@ -68,9 +68,9 @@ export class UXsyncNowREST {
     init(): Promise<void> {
         let debug = this.debug;
         return ( new Promise((resolve) => {
-            var valid = true;
-            var message = [];
-            var self = this;
+            let valid = true;
+            let message = [];
+            let self = this;
 
             _.each(['host', 'protocol', 'user', 'password'], (name) => {
                 if (this._options.get(name, '') === '') {
@@ -112,11 +112,12 @@ export class UXsyncNowREST {
                                     this._errorMessage = ret.errorMessage;
                                 }
                             } else {
-                                console.log("Whattt???");
+                                this._connected = false;
+                                this._errorMessage = "Instance returned no result information";
                             }
                         } else {
-                            // todo: Got an error of no body
-                            var a;
+                            this._connected = false;
+                            this._errorMessage = "Instance returned no information";
                         }
                         resolve();
                         return;
