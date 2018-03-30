@@ -1,6 +1,6 @@
-import fs = require("fs");
-import jsonfile = require("jsonfile");
-import _ = require("lodash");
+import * as fs from "fs"
+import * as jsonfile from "jsonfile";
+import * as _ from "lodash";
 import * as path from "path";
 
 export class Options {
@@ -34,7 +34,7 @@ export class Options {
             "If the instance is not on the standard HTTP/HTTPS port, specify the port with this option.  a Value of 0 means to use the default port",
         app: "Name of the application to sync",
         user: "User name to connect to the ServiceNow Instance",
-        password: "The ServiceNow user passwors to use to connect to the Instance",
+        password: "The ServiceNow user password to use to connect to the Instance",
         proxy:
             "If your connection requires the use of an HTTP proxy, set this value to your required proxy.",
         connection_max:
@@ -42,7 +42,7 @@ export class Options {
         connection_wait:
             "Time in milliseconds to wait between each connection to your instance. ",
         top_dir:
-            "The top directory where all the applications that are syned will be stored in the filesystem.",
+            "The top directory where all the applications that are synced will be stored in the filesystem.",
         interval:
             "The interval in ms between checking the instance for any file changes.  Default is 30000 or 30 seconds."
     };

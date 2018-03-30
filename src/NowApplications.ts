@@ -1,4 +1,3 @@
-import {NowConnection} from "./Connection";
 import Promise = require('bluebird');
 import {Options} from "./Options";
 import _ = require('lodash');

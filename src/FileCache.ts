@@ -1,18 +1,3 @@
-/*
- * 2018 UXstorm LLC
- * All Rights Reserved.
- * Copyright 2018
- *
- *  NOTICE: All information contained herein is, and remains the property of
- *  UXstorm LLC. The intellectual and technical concepts contained herein are
- *  proprietary to UXstorm LLC and may be covered by U.S. and Foreign Patents,
- *  patents in process, and are protected by trade secret or copyright law.
- *  Dissemination of this information or reproduction of this material is
- *  strictly forbidden unless prior written permission is obtained from UXstorm
- *  LLC. Use of this code is covered under license agreements with UXstorm LLC
- *
- */
-
 import fs = require('fs');
 import jsonfile = require('jsonfile');
 import {Options} from "./Options";
