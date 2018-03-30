@@ -11,6 +11,7 @@ import {NowFiles} from "./NowFiles";
 import {find} from 'lodash'
 import * as mkdirp from "mkdirp";
 import {Debug} from "./Debug";
+import {Conflicts} from "./Conflict";
 
 const EXTENSIONS = {
     html_script: "html",
@@ -232,6 +233,7 @@ export class NowFile {
                         mode = -1;  // Ignore the pull/push for now and post sync error
                         console.log(`SYNC ERROR for : ${this.fileName}`);
                         sync.filesReceived++;  // Mark it as complete as we can't pull/push
+                        new Conflicts().add(this);
 
                         // todo: post sync error
                     } else {
@@ -405,5 +407,20 @@ export class NowFile {
         if (this.initProcessed & 3) {
             this.initialized = true;
         }
+    }
+
+    push() {
+        // Push file contents to the Instance
+        this.debug.log('Pushing from instance')
+    }
+
+    pull() {
+        // PUll file contents from the Instance
+        this.debug.log('Pulling from instance')
+    }
+
+    merge() {
+        // Handle MERGE by getting the file contents from the Instance and store in a file with .merge extension
+        this.debug.log('Merging from instance')
     }
 }

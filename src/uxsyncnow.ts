@@ -11,6 +11,7 @@ import * as minimist from "minimist";
 import {NowFiles} from "./NowFiles";
 import {NowFile} from "./NowFile";
 import * as path from 'path';
+import {Conflicts, IResolveMode} from "./Conflict";
 import _ = require('lodash');
 
 const vorpal = vorpalPkg();
@@ -20,7 +21,7 @@ let debug = new Debug('main');
 // Process the command line
 
 let args = minimist(process.argv.slice(2), {
-    string: ['config','d', 'a'],
+    string: ['config', 'd', 'a'],
     boolean: ['prod', 'pull', 'push', 'sync', 'nowatch'],
     alias: {'h': 'help', 'p': 'prod', 'c': 'config', 'd': 'debug', 'a': 'areas'},
     default: {
@@ -98,13 +99,13 @@ api.init()
             debug.log('Getting Tables');
             NowTables.getNowTables()
                 .refresh()
-                .then( () => {
-                    tables = options.get( 'tables');
+                .then(() => {
+                    tables = options.get('tables');
                     if (cb) cb();
                 });
         }
 
-        function initSetup(cb?:any) {
+        function initSetup(cb?: any) {
             debug.log("Perform INIT");
             app = options.get('app');
             let sync = Sync.SYNC;
@@ -130,9 +131,10 @@ api.init()
                 })
             }
         }
+
         // init lists for first time
         if (api.connected) {
-                initSetup();
+            initSetup();
         } else {
             console.log("You are not connected to your instance.  Please setup your connection.");
             console.log(api.errorMessage);
@@ -141,7 +143,7 @@ api.init()
         if (!args.nowatch) {
             vorpal
                 .command('sync', 'Sets up the synchronization between the localfile system and the instance')
-                .action(function (args, callback){
+                .action(function (args, callback) {
                     initSetup(callback);
                 });
 
@@ -310,7 +312,7 @@ api.init()
             vorpal
                 .command('test', "Tests the connection to the instance")
                 .action(function (args, callback) {
-                    api.init().then( () => {
+                    api.init().then(() => {
                         if (api.connected) {
                             // Ok try the API
                             this.log("Connected!");
@@ -369,9 +371,62 @@ api.init()
                 });
 
             vorpal
+                .command('list conflicts', 'Lists all detected conflicts during synchronization')
+                .action(function (args, callback) {
+                    let conflicts = new Conflicts();
+                    let list = conflicts.list;
+                    for (let i = 0; i < list.length; i++) {
+                        this.log(_.pad(i + ') ', 5) + list[i].fileName);
+                    }
+                    callback();
+                });
+
+            vorpal
+                .command('resolve <conflictNumber> <mode>', 'Resolves conflict number by specified mode.  Number can be all to resolve all conflicts.  Mode can be PULL, PUSH, or MERGE.')
+                .action(function (args, callback) {
+                    let conflicts = new Conflicts();
+                    let list = conflicts.list;
+                    let mode = args.mode.toUpperCase();
+
+                    if (mode !== 'PULL' && mode !== 'PUSH' && mode !== 'MERGE') {
+                        this.log(`You have specified an invalid mode: ${mode}.  Pleases use PULL, PUS, or MERGE`);
+                        callback()
+                    } else {
+                        let start = 0;
+                        let end = list.length;
+                        let num = args.conflictNumber;
+                        if (typeof num === 'number') {
+                            // Ok should have a numb;
+                            start = end = num;
+                            end++;
+                        }
+                        this.log('Resolving conflicts by mode: ' + mode);
+                        this.log(`start = ${start} end = ${end}`)
+                        for (let i = end - 1; i >= start; i--) {
+                            this.log('  ' + list[i].fileName);
+                            let file = list[i];
+                            let rmode: IResolveMode;
+
+                            switch (mode) {
+                                case 'PULL' :
+                                    rmode = IResolveMode.PULL;
+                                    break;
+                                case 'PUSH' :
+                                    rmode = IResolveMode.PUSH;
+                                    break;
+                                case 'MERGE' :
+                                    rmode = IResolveMode.MERGE;
+                                    break;
+                            }
+                            conflicts.resolve(file, rmode);
+                        }
+                        callback();
+                    }
+                });
+
+            vorpal
                 .command('debug level <level>', 'Set the debug level')
                 .action(function (args, callback) {
-                    var log = vorpal.log;
                     Debug.level = parseInt(args.level);
                     callback();
                 });
