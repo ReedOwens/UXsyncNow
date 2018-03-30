@@ -89,9 +89,13 @@ export class UXsyncNowREST {
                         if (body) {
                             if (typeof body["error"] !== 'undefined') {
                                 // Got an error object
-                                let error = body.error;
-                                if ((body.error.message + "").indexOf("Requested URI does not represent any resource:") >= 0) {
-                                    this._connected = false;
+                                this._errorMessage = body.error.message;
+                                this._connected = false;
+
+                                if (this._errorMessage.indexOf("User Not Authenticated") >= 0) {
+                                    this._errorMessage = 'Either the username or password is incorrect';
+                                }
+                                if (this._errorMessage.indexOf("Requested URI does not represent any resource:") >= 0) {
                                     this._errorMessage = "Instance does not contain UXsyncNow REST services.  Is the UXsyncNow Application installed on the instance?";
                                 }
                                 // todo: Check for other errors
@@ -100,8 +104,13 @@ export class UXsyncNowREST {
                             }
                             if (body.result) {
                                 let ret = body.result;
-                                this._connected = (ret.result === "SUCCESS");
-                                this._errorMessage = ret.errorMessage;
+                                if (ret.result === 'ERROR') {
+                                    this._connected = false;
+                                    this._errorMessage = ret.message;
+                                } else {
+                                    this._connected = (ret.result === "SUCCESS");
+                                    this._errorMessage = ret.errorMessage;
+                                }
                             } else {
                                 console.log("Whattt???");
                             }
@@ -113,9 +122,10 @@ export class UXsyncNowREST {
                         return;
                     })
                     .error((reason) => {
-                        console.log("Error received " + reason);
-                        console.log(reason);
+//                        console.log("Error received " + reason);
+//                        console.log(reason);
                         this._connected = false;
+                        this._errorMessage = reason;
                         resolve();
                         return;
                     });
