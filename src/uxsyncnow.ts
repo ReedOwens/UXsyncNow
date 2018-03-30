@@ -83,18 +83,29 @@ api.init()
         let app = null;
         let appWatcher: AppWatcher;
 
+        function refreshApps(cb?: any) {
+            debug.log('Getting Applications');
+            applications
+                .refresh()
+                .then(() => {
+                    apps = options.get('applications');
+                    if (cb) cb();
+                })
+
+        }
+
+        function refreshTables(cb: any) {
+            debug.log('Getting Tables');
+            NowTables.getNowTables()
+                .refresh()
+                .then( () => {
+                    tables = options.get( 'tables');
+                    if (cb) cb();
+                });
+        }
+
         function initSetup(cb?:any) {
             debug.log("Perform INIT");
-            if (_.size(apps) == 0) {
-                debug.log('Getting Applications');
-                applications.refresh()
-                    .then(() => apps = options.get('applications'))
-            }
-            if (_.size(tables) === 0) {
-                debug.log('Getting Tables');
-                NowTables.getNowTables().refresh();
-
-            }
             app = options.get('app');
             let sync = Sync.SYNC;
             if (args.push) {
@@ -104,7 +115,7 @@ api.init()
             }
             let interval = options.get('interval', 30000);
 
-            if (app && app['sys_id']) {
+            if (typeof app !== 'undefined' && app['sys_id']) {
                 if (appWatcher) {
                     appWatcher.close();
                 }
@@ -326,22 +337,32 @@ api.init()
                 .command('refresh apps', 'Refreshes the current list of ServiceNow Applications')
                 .action(function (args, callback) {
                     this.log("Refreshing applications");
-                    applications.refresh().then(() => {
-                        apps = options.get('applications', {});
-                        this.log("done");
+                    refreshApps(() => {
+                        this.log("Done.");
                         callback();
-                    })
+                    });
+                });
+            vorpal
+                .command('refresh all', 'Refreshes the the Applications and tables from the Instance')
+                .action(function (args, callback) {
+                    this.log("Refreshing applications");
+                    refreshApps(() => {
+                        this.log("Refreshing tables");
+                        refreshTables(() => {
+                            this.log("Done.");
+                            callback();
+                        });
+                    });
                 });
 
             vorpal
                 .command('refresh tables', 'Refreshes the tables that are synchronized.  If you add new fields to tables that are HTML/XML/Script then you will need to run this command to pick up the new fields.  ')
                 .action(function (args, callback) {
                     this.log("Refreshing tables");
-                    NowTables.getNowTables().refresh()
-                        .then(() => {
-                            this.log("done");
-                            callback();
-                        })
+                    refreshTables(() => {
+                        this.log("Done.");
+                        callback();
+                    });
                 });
             vorpal
                 .command('testit', 'testit test')

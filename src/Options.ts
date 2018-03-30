@@ -7,12 +7,19 @@ export class Options {
     private static singleton: Options = null;
     private options: any = {
         host: "uxstormdev5.service-now.com",
-        protocol: "https",
+        protocol: "http",
         port: 0,
         user: "resttest",
         password: "abc123",
         applications: [],
-        app: "",
+        app:  {
+            "id": 14,
+            "sys_id": "f58f6f7df793030022d7e4c7238dff47",
+            "version": "1.0.0",
+            "short_description": "",
+            "scope": "x_test_app_for_uxs",
+            "name": "Test App for UXsyncNow"
+        },
         app_sys_id: "",
         proxy: "",
         interval: 3000,

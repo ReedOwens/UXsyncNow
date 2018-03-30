@@ -197,7 +197,7 @@ export class NowFile {
         if (sync.init) {
             // override if ininiting
             mode = sync.initMode;
-            //todo: This is na init and there is a difference.  Check and see if local file changed since last write
+            //todo: This is init and there is a difference.  Check and see if local file changed since last write
 
             // This is an init.  Lets check to see if the there is a change on the server
 
@@ -226,10 +226,20 @@ export class NowFile {
             if (client && server) {
                 // there was both a client and server change... Conflict MUST be resolved
                 if (mode == Sync.SYNC) {
-                    mode = -1;  // Ignore the pull/push for now and post sync error
-                    console.log(`SYNC ERROR for : ${this.fileName}`);
+                    // Check and see if the local file doesn't exist anymore
+                    if (fs.existsSync(this.fileName)) {
+                        // OK file exists and is different on the client too.
+                        mode = -1;  // Ignore the pull/push for now and post sync error
+                        console.log(`SYNC ERROR for : ${this.fileName}`);
+                        sync.filesReceived++;  // Mark it as complete as we can't pull/push
+
+                        // todo: post sync error
+                    } else {
+                        // File is not local, so lets pull from server
+                        mode = Sync.PULL;
+                    }
                 }
-                // todo: post sync error
+                // IF it's not SYNC, then the methodology is PUSH or PULL and doesn't need to be changed.
             } else {
                 if (client) {
                     mode = Sync.PUSH; // Push the change
@@ -268,13 +278,13 @@ export class NowFile {
             case Sync.PUSH:
             case Sync.LOCAL:
                 // todo: push change
-                /*console.log(
+                this.debug.log(
                     `Save to instance ${this._tableName}, ${this._fieldName}, ${
                         this._recordID
                         }`
                 );
-                console.log(`  ${this._fileName}`);
-                */
+                this.debug.log(`  ${this._fileName}`);
+
                 let localContents = fs.readFileSync(this._fileName);
                 if (localContents)
                     this.api
@@ -317,11 +327,11 @@ export class NowFile {
                         let content = files[this._fieldName];
                         let CRC = this.calcCRC(content);
 
-                        /* console.log(
+                        this.debug.log(
                             `writing from server${this._fileName} -> ${
                                 this._fieldName
                                 } crc ${CRC} instance ${this._crc}`
-                        ); */
+                        );
                         this._crc = CRC;
                         this.localCRC = CRC;
                         let dirName = path.dirname(this._fileName);

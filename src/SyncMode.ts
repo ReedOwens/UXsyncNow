@@ -71,9 +71,12 @@ export class SyncMode {
 
     set filesReceived(value: number) {
         this._filesReceived = value;
+        if (!this.init) {
+            return;
+        }
         this.debug.log(`FilesReceived: ${this._filesReceived} out of ${this._filesToGet} init: ${this.init}`);
 
-        if (this.init && this._filesReceived >= this._filesToGet) {
+        if (this._filesReceived >= this._filesToGet) {
             this.debug.log(
                 `Received last file ${value} looking for ${this._filesToGet}`
             );
