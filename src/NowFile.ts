@@ -10,6 +10,7 @@ import {ITableDef} from "./NowTables";
 import {NowFiles} from "./NowFiles";
 import {find} from 'lodash'
 import * as mkdirp from "mkdirp";
+import {Debug} from "./Debug";
 
 const EXTENSIONS = {
     html_script: "html",
@@ -20,6 +21,7 @@ const EXTENSIONS = {
 };
 
 export class NowFile {
+    private debug = new Debug('NowFile');
     private localCRC = 0;
     // Name of the file in the filesystem
     private _fileName = "";
@@ -43,6 +45,7 @@ export class NowFile {
         //   if provided, then update the file with the content and instanceLastUpdated time.
         //       NOTE: If the content is the same then the file will not be updated
 
+        this.debug.log("Creating new File");
         let mode = new SyncMode();
 
         this._crc = instanceCRC ? instanceCRC : 0;

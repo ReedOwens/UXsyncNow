@@ -6,6 +6,7 @@ import {UXsyncNowREST} from "./UXsyncNowREST";
 import {NowFile} from "./NowFile";
 import {forEach} from 'lodash';
 import {Notify} from "./Notify";
+import {Debug} from "./Debug";
 
 /**
  * IAppWatcher
@@ -21,6 +22,7 @@ export interface IAppWatcher {
 }
 
 export class AppWatcher {
+    private debug = new Debug('AppWatcher');
     private interval: any;
     private options = new Options();
     private tables = this.options.get( 'tables', {} );
@@ -50,17 +52,25 @@ export class AppWatcher {
         } else {
             this.pull.initMode = Sync.SYNC;
         }
+
+        this.debug.log(`App: ${app} name: ${appName} sync: ${this.pull.initMode}`);
         this.watch = options.pullOnly ? false : true;
 
         // If this is not a pull only run, then setup the interval pull from instance
         // and the file watcher
         if (this.watch) {
+            this.debug.log('Setting up watch');
             const ms = options.interval ? options.interval : 30000;
             this.pull.whenDone = () => {
+                this.debug.log('Got all the files');
                 // When the initial pull is done, setup the timer to pull
                 // from the instance
                 Notify.showMessage = true;
                 this.interval = setInterval(() => this.pullFromInstance(), ms);
+                if (whenDone) {
+                    this.debug.log("Calling WhenDone");
+                    whenDone();
+                }
             };
             this.watcher = Watcher.getWatcher();
             let files = new NowFiles();
@@ -73,7 +83,9 @@ export class AppWatcher {
             };
         } else {
             this.pull.whenDone = () => {
+                this.debug.log("The initial pull is done");
                 if (whenDone) {
+                    this.debug.log("Calling WhenDone");
                     whenDone();
                 }
             };
@@ -81,10 +93,16 @@ export class AppWatcher {
         this.pullFromInstance();
     }
 
+    close() {
+        if (this.watch) {
+            this.watcher.close();
+        }
+    }
     /**
      * Pull application files from the instance.
      */
     private pullFromInstance() {
+        this.debug.log('Pull from instance',2);
         this.api.getApplicationFiles(this.tables, this.app, this.now)
             .then(result => {
                 this.now = parseInt(result.now, 10);

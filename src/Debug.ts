@@ -5,7 +5,6 @@ export class Debug {
     private static _vorpal:any = null;
     private static _filter: string[] = [];
     private static _areas: string[] = [];
-    private area = '';
 
     static get vorpal(): any {
         return this._vorpal;
@@ -47,8 +46,7 @@ export class Debug {
         }
     }
 
-    constructor(area:string = 'gen') {
-        this.area = area;
+    constructor(private area:string = 'gen') {
         Debug._areas.push(area);
     }
 }

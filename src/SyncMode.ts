@@ -1,3 +1,5 @@
+import {Debug} from "./Debug";
+
 export enum Sync {
     "PULL",
     "PUSH",
@@ -10,7 +12,7 @@ export enum Sync {
  * Type of Sync
  */
 export class SyncMode {
-
+    private debug = new Debug('SyncMode');
     private static _singleton: SyncMode = null;
 
     static get singleton(): SyncMode {
@@ -69,11 +71,16 @@ export class SyncMode {
 
     set filesReceived(value: number) {
         this._filesReceived = value;
+        this.debug.log(`FilesReceived: ${this._filesReceived} out of ${this._filesToGet} init: ${this.init}`);
+
         if (this.init && this._filesReceived >= this._filesToGet) {
-            /*console.log(
+            this.debug.log(
                 `Received last file ${value} looking for ${this._filesToGet}`
-            ); */
-            if (this.whenDone) this.whenDone();
+            );
+            if (this.whenDone) {
+                this.debug.log("Calling WhenDone");
+                this.whenDone();
+            }
             this.init = false;
         }
     }

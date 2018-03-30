@@ -1,7 +1,9 @@
 import {NowFile} from "./NowFile";
 import {findIndex, forEach} from "lodash";
+import {Debug} from "./Debug";
 
 export class NowFiles {
+    private debug = new Debug('NowFiles');
     static filesSingleton: NowFiles;
     files: NowFile[] = [];
 
@@ -13,14 +15,20 @@ export class NowFiles {
     }
 
     add(file: NowFile) {
+        this.debug.log(`Add ${file.fileName}`);
         this.files.push(file);
     }
 
     remove(file: NowFile) {
         let index = findIndex(this.files,file);
         if (index>=0) {
+            this.debug.log(`Removing ${file}`);
             this.files.splice(index,1);
         }
+    }
+
+    clear() {
+        this.files = [];
     }
 
     paths(): string[] {
