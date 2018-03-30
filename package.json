@@ -1,6 +1,6 @@
 {
   "name": "uxsyncnow",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "UXstorm's ServiceNow file synchronizer / development tool",
   "main": "uxsyncnow.js",
   "scripts": {
@@ -16,7 +16,15 @@
     "filesync",
     "sync"
   ],
-  "author": "reed.owens",
+  "bugs": {
+    "url": "https://github.com/ReedOwens/UXsyncNow/issues"
+  },
+  "repository" :
+  {
+    "type": "git",
+    "url": "https://github.com/ReedOwens/UXsyncNow.git"
+  },
+  "author": "Reed Owens <reed.owens@UXstorm.com> (http://uxstorm.com)",
   "license": "AGPL-3.0+",
   "dependencies": {
     "bluebird": "^3.5.1",
