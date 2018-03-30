@@ -98,12 +98,12 @@ export class NowFile {
 
                 let relSource = path.relative(base,this._fileName);
 
-                console.log('Relative path is ' + relSource);
+                this.debug.log('Relative path is ' + relSource);
                 // Check and see if there is an override for this file
                 let over = find(fileOverride, { source: relSource});
                 if (over) {
                     let dest = over['dest'];
-                    console.log('Found override ' + dest );
+                    this.debug.log('Found override ' + dest );
                     if (dest) {
                         if (!path.isAbsolute(dest)) {
                             dest = path.normalize(base + path.sep + dest );
@@ -114,11 +114,11 @@ export class NowFile {
                 }
                 this.processLocalFile();
                 if (this._crc !== this.localCRC) {
-                   /* console.log(
+                   this.debug.log(
                         `Need to process the Instance  ${this._tableName}, ${
                             this._recordName
                             } ${this._fieldName} -> ${this._crc}  ${this.localCRC}`
-                    ); */
+                    );
                     this.processInstance();
                 } else {
                     let stats = fs.statSync(this._fileName);

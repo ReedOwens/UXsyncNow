@@ -140,7 +140,7 @@ api.init()
 
         if (!args.nowatch) {
             vorpal
-                .command('init', 'Init')
+                .command('sync', 'Sets up the synchronization between the localfile system and the instance')
                 .action(function (args, callback){
                     initSetup(callback);
                 });
@@ -282,6 +282,7 @@ api.init()
                     }
                     callback();
                 });
+
             vorpal
                 .command('set option <option> [value]', "Sets the option to specified value or prompts for the value if not provided")
                 .autocomplete(options.asArray())
@@ -336,6 +337,8 @@ api.init()
             vorpal
                 .command('refresh apps', 'Refreshes the current list of ServiceNow Applications')
                 .action(function (args, callback) {
+
+
                     this.log("Refreshing applications");
                     refreshApps(() => {
                         this.log("Done.");
@@ -363,77 +366,6 @@ api.init()
                         this.log("Done.");
                         callback();
                     });
-                });
-            vorpal
-                .command('testit', 'testit test')
-                .action(function (args, callback) {
-
-                    debug.log("DO it test it");
-                    //let ret = NowTables.getNowTables().list();
-                    //debug.log("Receved -> " + ret);
-                    callback();
-                });
-
-            vorpal
-                .command('doit', 'doit test')
-                .action(function (args, callback) {
-
-                    debug.log("DO it test");
-                    let tables = options.get('tables', {});
-
-                    api.getApplicationFiles(tables, "ad5c5f11f7131200d03eedd0358dff1b")  // PDF Application
-                        //api.getApplicationFiles(tables, "f58f6f7df793030022d7e4c7238dff47")  // Test Application
-                        .then((result) => {
-                            let ext = {
-                                html_script: "html",
-                                script: "js",
-                                script_plain: "js",
-                                html: "html",
-                                xml: "xml"
-                            };
-
-                            function getFilePath(baseDir, topDir, app, table, name, field, crc): string {
-                                let tbl = tables[table];
-                                if (tbl) {
-                                    let fld = _.find(tbl.fields, {name: field});
-                                    if (fld) {
-                                        let type = ext[fld['type']];
-                                        if (typeof type === "undefined") type = "unknown";
-
-                                        return (baseDir + "/" + topDir + "/" + app + "/" + table + "/" + name + "_" + field + "." + type + " (" + crc + ")");
-                                    }
-                                }
-                                return undefined;
-                            }
-
-                            debug.log("Got app files @" + result.now);
-
-                            this.log("Got files");
-                            _.forEach(result.files, (file) => {
-//                            this.log(`${file.table}(${file.sys_id}) -- ${file.name}`);
-//                            this.log("   Fields -> " + file.fields.join(','));
-                                if (file.fields) {
-                                    for (var i = 0; i < file.fields.length; i++) {
-                                        var fld = file.fields[i];
-                                        var fldcrc = file.crc[i];
-                                        this.log("  " + getFilePath("/base/", "top_dir", "myapp", file.table, file.name, fld, fldcrc))
-                                    }
-                                }
-                            })
-                        });
-//                let t = NowApplications.getNowApplications();
-//                t.refresh();
-                    callback();
-                    return;
-                    /*
-                                    let tables = options.get('tables', {});
-                                    apps = options.get('applications', {});
-                                    api.getApplicationFiles(tables,'ef0f7f4cdb13b2003e1b7a131f961989')
-                                        .then((data) =>{
-                                            this.log("Got results");
-                                            callback();
-                                        });
-                                        */
                 });
 
             vorpal
