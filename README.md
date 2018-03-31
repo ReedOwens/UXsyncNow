@@ -117,3 +117,33 @@ uxsyncnow:
 ```
 
 This initialization will create a file in the current directory named uxsyncnow-config-XXX.json and a directory named .uxsyncnow-XXX where XXX is the configuration type.  By default this will be dev.  If ran with a -p option then it will be prod.  The .json file should be put under source control and the directory ignored by source control.  The directory contains the cache information.
+
+## Running with existing Work Area
+
+If a work area has already been setup, then all you need to do is run **uxsyncnow**.  If the work area is the dev work area, nothing extra needs to be specified.  You can specify the production work area by using the command line argument -p `uxsyncnow -p` .  Additional work areas can be used by specifying their name with the -c option.  For example a work area called reed can be specified by `uxsyncnow -c reed`.
+
+# Command Line Options
+
+**uxsyncnow** supports both short and long format for the command line options.  Short options are one char and are preceded by a single -.  Long options are words and preceded by two -.
+
+| ---------------------- | -------------------------------------|
+| Option                  | Description                             |
+| ---------------------- | -------------------------------------|
+|-a *\<areas>**, --areas  *\<areas>* | Specifies the areas in the application that the debug statements will be printed.  *\<areas>* is a comma decimated list of the areas.  *See debug areas Application Command for list of areas* |
+|-c *\<type>*, --config *\<type>* | Specifies the type of configuration to use by *\<type>* |
+| -d *num*, --debug *num* | Sets the debug level to *num* |
+| 
+
+
+# Application Command Line 
+
+# Conflicts
+
+# Syntonization Modes
+
+## Sync
+
+## Pull
+
+## Push
+
