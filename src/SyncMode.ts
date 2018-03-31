@@ -12,7 +12,7 @@ export enum Sync {
  * Type of Sync
  */
 export class SyncMode {
-    private debug = new Debug('SyncMode');
+    private static debug = new Debug('SyncMode');
     private static _singleton: SyncMode = null;
 
     static get singleton(): SyncMode {
@@ -74,14 +74,14 @@ export class SyncMode {
         if (!this.init) {
             return;
         }
-        this.debug.log(`FilesReceived: ${this._filesReceived} out of ${this._filesToGet} init: ${this.init}`);
+        SyncMode.debug.log(`FilesReceived: ${this._filesReceived} out of ${this._filesToGet} init: ${this.init}`);
 
         if (this._filesReceived >= this._filesToGet) {
-            this.debug.log(
+            SyncMode.debug.log(
                 `Received last file ${value} looking for ${this._filesToGet}`
             );
             if (this.whenDone) {
-                this.debug.log("Calling WhenDone");
+                SyncMode.debug.log("Calling WhenDone");
                 this.whenDone();
             }
             this.init = false;

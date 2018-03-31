@@ -9,13 +9,17 @@ export enum IResolveMode {
 }
 
 export class Conflicts {
-    private debug = new Debug("Conflict");
+   // private debug = new Debug("Conflict");
     private static  _singleTon: Conflicts = null;
     private _list: NowFile[] = [];
 
     constructor() {
         if( Conflicts._singleTon ) return Conflicts._singleTon;
         Conflicts._singleTon = this;
+    }
+
+    get length(): number {
+        return this._list.length;
     }
 
     add( file: NowFile ) {
@@ -42,11 +46,13 @@ export class Conflicts {
         if (i>=0) {
             switch (mode) {
                 case IResolveMode.PULL:
-                    this._list[i].pull();
+                    this._list[i].pullFile();
                     break;
                 case IResolveMode.PUSH:
-                    this._list[i].push();
+                    this._list[i].pushFile();
                     break;
+                case IResolveMode.MERGE:
+                    this._list[i].mergeFile();
             }
             this._list.splice(i,1);
         }

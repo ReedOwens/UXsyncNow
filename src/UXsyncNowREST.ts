@@ -312,7 +312,7 @@ export class UXsyncNowREST {
                 sys_id : sys_id,
                 fields: flds
             };
-            console.log('GET FILE ' + table + + ' ' + fields )
+            this.debug.log('GET FILE ' + table + + ' ' + fields )
             let connection = NowConnection.getConnection();
             connection.putp(ENDPOINT + "/getFile", body)
                 .then(function (data: any) {

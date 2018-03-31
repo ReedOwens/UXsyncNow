@@ -42,7 +42,7 @@ let args = minimist(process.argv.slice(2), {
 // Setup debug level and filter from command lined
 Debug.level = parseInt(args.debug);
 if (args.areas != '') {
-    Debug.filter = args.areas;
+    _.forEach(args.areas.split(','), (area) => Debug.filter(area));
 }
 
 let configType = args.config;
@@ -127,6 +127,11 @@ api.init()
                     interval: interval
                 }, () => {
                     debug.log('GOT THE PULL');
+
+                    let cl = new Conflicts().length;
+                    if (cl > 0) {
+                        vorpal.log(`${cl} Conflicts Detected in sync`)
+                    }
                     if (cb) cb();
                 })
             }
@@ -371,7 +376,7 @@ api.init()
                 });
 
             vorpal
-                .command('list conflicts', 'Lists all detected conflicts during synchronization')
+                .command('conflicts', 'Shows all detected conflicts during synchronization')
                 .action(function (args, callback) {
                     let conflicts = new Conflicts();
                     let list = conflicts.list;
@@ -401,7 +406,6 @@ api.init()
                             end++;
                         }
                         this.log('Resolving conflicts by mode: ' + mode);
-                        this.log(`start = ${start} end = ${end}`)
                         for (let i = end - 1; i >= start; i--) {
                             this.log('  ' + list[i].fileName);
                             let file = list[i];

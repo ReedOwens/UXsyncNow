@@ -2,6 +2,7 @@ import * as fs from "fs"
 import * as jsonfile from "jsonfile";
 import * as _ from "lodash";
 import * as path from "path";
+import * as CryptoJS from "crypto-js";
 
 export class Options {
     private static singleton: Options = null;
@@ -114,12 +115,30 @@ export class Options {
     /**
      * Sets an option value
      *
+     * password is encrypted
+     * interval can not be set to a value < 1000ms
+     *
      * @param {string} name
      * @param value
      */
 
     set(name: string, value: any) {
-        this.options[name] = value;
+        let v = value;
+        switch (name) {
+            case "password" :
+                // Handle encryption of password
+                v = CryptoJS.AES.encrypt(value, '1N33dUX5t0rm!').toString();
+                break;
+            case "interval" :
+                try {
+                    let i = parseInt(value);
+                    if (i < 1000) {
+                        v = "1000";
+                    }
+                } catch (e) {}
+                break;
+        }
+        this.options[name] = v;
     }
 
     /**
@@ -127,13 +146,24 @@ export class Options {
      * exist, then defaultValue is return.  If the option doesn't exist and no defaultValue
      * is provided then null is returned.
      *
+     * password is decrypted before passing back.
+     *
      * @param {string} name
      * @param defaultValue
      * @returns {any}
      */
 
     get(name: string, defaultValue?: any): any {
-        if (typeof this.options[name] !== "undefined") return this.options[name];
+        if (typeof this.options[name] !== "undefined") {
+            let v = this.options[name];
+            switch (name) {
+                case "password" :
+                    let bytes  = CryptoJS.AES.decrypt(v, '1N33dUX5t0rm!');
+                    v = bytes.toString(CryptoJS.enc.Utf8);
+                    break;
+            }
+            return v;
+        }
         if (typeof defaultValue === "undefined") return null;
         return defaultValue;
     }
