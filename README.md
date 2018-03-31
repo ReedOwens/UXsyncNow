@@ -70,10 +70,11 @@ Goto the directory where you want the work area to be created and follow the fol
 
 Here is the command output of an initial connection using 
 
-|:-------------|------------------
+| Option        | Value          |
+| ------------- | ---------------|
 | host          | uxstormdev1.service-now.com
 | user          | reed.owens
-| password | not shown
+| password      | not shown
 
 
 ```
@@ -115,4 +116,4 @@ uxsyncnow: sync
 uxsyncnow:
 ```
 
-This initializationon will create a file in the current directory named uxsyncnow-config-XXX.json and a directory named .uxsyncnow-XXX where XXX is the configuration type.  By default this will be dev.  If ran with a -p option then it will be prod.  The .json file should be put under source control and the directory ignored by source control.  The directory contains the cache information.
+This initialization will create a file in the current directory named uxsyncnow-config-XXX.json and a directory named .uxsyncnow-XXX where XXX is the configuration type.  By default this will be dev.  If ran with a -p option then it will be prod.  The .json file should be put under source control and the directory ignored by source control.  The directory contains the cache information.
