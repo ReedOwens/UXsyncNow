@@ -142,7 +142,7 @@ If a work area has already been setup, then all you need to do is run **uxsyncno
 # Application Command Line 
 **uxsyncnow** provides an application command line interface to interact with the application.   When the application is started you will receive a command prompt `uxsyncnow:` and can run any of the application commands via this interface.  Try `help` to get started.
 
-# conflicts
+## conflicts
 
 Lists all the conflicts detected by sync
 
@@ -259,19 +259,9 @@ Valid options are:
 |protocol                    | The web protocol to use for the ServiceNow instance.  This can be either http or https.  The default is https |
 | proxy                        | Specifies a Web Proxy server to send all requests through. |
 | top_dir                     |  By default, all the directories of files from the instance will be created in the current directory where **uxsyncnow** is ran.  If you want to have the instance directories and files in a subdirectory, you can do this by specifying the top_dir.  This will create a directory as specified and will contain work area._|
-|  user                           | The username of the ServiceNow user to connect to the instance.   NOTE: This user must have the roles of **admin** and **uxsyncnow_user**._|
+|  user                           | The username of the ServiceNow user to connect to the instance.   NOTE: This user must have the roles of **admin** and **uxsyncnow_user** |
 
 ## sync
 
 Synchronizes the local work area and the Application files on the instance.  It uses the current synchronizationn mode.  NOTE:  This only needs to be used during first initialization or if you make any configuration changes requiring a re-sync.  By default, **uxsyncnow** starts up in sync mode if it can connect to the instance and an application was set.
-
- # Conflicts
-
-# Synchronization Modes
-
-## SYNC
-
-## PULL
-
-## PUSH
 
