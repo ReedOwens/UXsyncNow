@@ -7,23 +7,16 @@ import * as CryptoJS from "crypto-js";
 export class Options {
     private static singleton: Options = null;
     private options: any = {
-        host: "uxstormdev5.service-now.com",
-        protocol: "http",
+        host: "",
+        protocol: "https",
         port: 0,
-        user: "resttest",
-        password: "abc123",
+        user: "",
+        password: "",
         applications: [],
-        app:  {
-            "id": 14,
-            "sys_id": "f58f6f7df793030022d7e4c7238dff47",
-            "version": "1.0.0",
-            "short_description": "",
-            "scope": "x_test_app_for_uxs",
-            "name": "Test App for UXsyncNow"
-        },
+        app: "",
         app_sys_id: "",
         proxy: "",
-        interval: 3000,
+        interval: 30000,
         connection_max: 0,
         connection_wait: 0,
         top_dir: "",
@@ -76,7 +69,7 @@ export class Options {
                 if (fs.existsSync(this.configFile)) {
                     this.read();
                 } else {
-                    console.log("Creating config file with defaults");
+                    //console.log("Creating config file with defaults");
                     this.save();
                 }
             } else {
@@ -87,7 +80,7 @@ export class Options {
                 process.exit(-1);
             }
         } else {
-            console.log("Creating config file with defaults");
+            //console.log("Creating config file with defaults");
             fs.mkdirSync(this.configFileDir);
             this.save();
         }

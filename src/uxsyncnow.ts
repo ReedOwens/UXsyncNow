@@ -266,8 +266,9 @@ api.init()
                     callback();
                 });
             vorpal
-                .command('set app [value]', 'Sets the current application')
+                .command('set app <value>', 'Sets the current application')
                 .action(function (args, callback) {
+                    // todo: implement prompt later
                     if (typeof args.value === 'undefined') {
                         // Prompt for the app
                         this.log('Prompt');
@@ -315,7 +316,7 @@ api.init()
                 });
 
             vorpal
-                .command('test', "Tests the connection to the instance")
+                .command('connect', "Connect to the instance")
                 .action(function (args, callback) {
                     api.init().then(() => {
                         if (api.connected) {

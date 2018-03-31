@@ -186,7 +186,7 @@ export class NowFile {
             let contents = fs.readFileSync(this._fileName);
             this.localCRC = this.calcCRC(contents.toString());
         } catch (e) {
-            console.log(`File: '${this._fileName}' doesn't exist`);
+            //console.log(`File: '${this._fileName}' doesn't exist`);
         }
         this.initUpdate(1);
     }
