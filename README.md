@@ -128,11 +128,10 @@ If a work area has already been setup, then all you need to do is run **uxsyncno
 
 | ---------------------- | -------------------------------------|
 | Option                  | Description                             |
-| ---------------------- | -------------------------------------|
 |-a *\<areas>**, --areas  *\<areas>* | Specifies the areas in the application that the debug statements will be printed.  *\<areas>* is a comma decimated list of the areas.  *See debug areas Application Command for list of areas* |
 |-c *\<type>*, --config *\<type>* | Specifies the type of configuration to use by *\<type>* |
 | -d *num*, --debug *num* | Sets the debug level to *num* |
-| 
+ 
 
 
 # Application Command Line 
