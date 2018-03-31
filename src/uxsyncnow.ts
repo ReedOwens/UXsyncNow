@@ -315,7 +315,7 @@ api.init()
                 });
 
             vorpal
-                .command('test', "Tests the connection to the instance")
+                .command('connect', "Connect to the instance")
                 .action(function (args, callback) {
                     api.init().then(() => {
                         if (api.connected) {

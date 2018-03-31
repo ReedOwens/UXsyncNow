@@ -37,7 +37,6 @@ export class FileCache {
                 if (fs.existsSync(this.configFile)) {
                     this.read();
                 } else {
-                    console.log('Creating config file with defaults');
                     this.save();
                 }
             } else {
@@ -45,7 +44,6 @@ export class FileCache {
                 process.exit(-1);
             }
         } else {
-            console.log("Creating config file with defaults");
             fs.mkdirSync(configDir);
             this.save();
         }
