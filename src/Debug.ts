@@ -1,11 +1,10 @@
-import _ = require('lodash');
+import {padEnd,clone} from 'lodash';
 
 export class Debug {
     private static _level:number = 0;
     private static _vorpal:any = null;
     private static _filter: string[] = [];
     private static _areas: string[] = [];
-    private area = '';
 
     static get vorpal(): any {
         return this._vorpal;
@@ -24,7 +23,7 @@ export class Debug {
     }
 
     static get areas():string [] {
-        let areas:string [] = _.clone(Debug._areas);
+        let areas:string [] = clone(Debug._areas);
         return areas;
     }
 
@@ -41,14 +40,15 @@ export class Debug {
             if (Debug._filter.length>0 && Debug._filter.indexOf(this.area)=== -1)
                 return;
             if (Debug.vorpal)
-                Debug.vorpal.log( _.padEnd(this.area,15) + ": " + msg);
+                Debug.vorpal.log( padEnd(this.area,15) + ": " + msg);
             else
-                console.log( _.padEnd(this.area,15) + ": " + msg);
+                console.log( padEnd(this.area,15) + ": " + msg);
         }
     }
 
-    constructor(area:string = 'gen') {
-        this.area = area;
-        Debug._areas.push(area);
+    constructor(private area:string = 'gen') {
+        if (Debug._areas.indexOf(area) === -1 ) {
+            Debug._areas.push(area);
+        }
     }
 }

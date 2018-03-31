@@ -1,18 +1,26 @@
-import fs = require("fs");
-import jsonfile = require("jsonfile");
-import _ = require("lodash");
+import * as fs from "fs"
+import * as jsonfile from "jsonfile";
+import * as _ from "lodash";
 import * as path from "path";
+import * as CryptoJS from "crypto-js";
 
 export class Options {
     private static singleton: Options = null;
     private options: any = {
-        host: "",
-        protocol: "https",
+        host: "uxstormdev5.service-now.com",
+        protocol: "http",
         port: 0,
-        user: "",
-        password: "",
+        user: "resttest",
+        password: "abc123",
         applications: [],
-        app: "",
+        app:  {
+            "id": 14,
+            "sys_id": "f58f6f7df793030022d7e4c7238dff47",
+            "version": "1.0.0",
+            "short_description": "",
+            "scope": "x_test_app_for_uxs",
+            "name": "Test App for UXsyncNow"
+        },
         app_sys_id: "",
         proxy: "",
         interval: 3000,
@@ -34,7 +42,7 @@ export class Options {
             "If the instance is not on the standard HTTP/HTTPS port, specify the port with this option.  a Value of 0 means to use the default port",
         app: "Name of the application to sync",
         user: "User name to connect to the ServiceNow Instance",
-        password: "The ServiceNow user passwors to use to connect to the Instance",
+        password: "The ServiceNow user password to use to connect to the Instance",
         proxy:
             "If your connection requires the use of an HTTP proxy, set this value to your required proxy.",
         connection_max:
@@ -42,7 +50,7 @@ export class Options {
         connection_wait:
             "Time in milliseconds to wait between each connection to your instance. ",
         top_dir:
-            "The top directory where all the applications that are syned will be stored in the filesystem.",
+            "The top directory where all the applications that are synced will be stored in the filesystem.",
         interval:
             "The interval in ms between checking the instance for any file changes.  Default is 30000 or 30 seconds."
     };
@@ -107,12 +115,30 @@ export class Options {
     /**
      * Sets an option value
      *
+     * password is encrypted
+     * interval can not be set to a value < 1000ms
+     *
      * @param {string} name
      * @param value
      */
 
     set(name: string, value: any) {
-        this.options[name] = value;
+        let v = value;
+        switch (name) {
+            case "password" :
+                // Handle encryption of password
+                v = CryptoJS.AES.encrypt(value, '1N33dUX5t0rm!').toString();
+                break;
+            case "interval" :
+                try {
+                    let i = parseInt(value);
+                    if (i < 1000) {
+                        v = "1000";
+                    }
+                } catch (e) {}
+                break;
+        }
+        this.options[name] = v;
     }
 
     /**
@@ -120,13 +146,24 @@ export class Options {
      * exist, then defaultValue is return.  If the option doesn't exist and no defaultValue
      * is provided then null is returned.
      *
+     * password is decrypted before passing back.
+     *
      * @param {string} name
      * @param defaultValue
      * @returns {any}
      */
 
     get(name: string, defaultValue?: any): any {
-        if (typeof this.options[name] !== "undefined") return this.options[name];
+        if (typeof this.options[name] !== "undefined") {
+            let v = this.options[name];
+            switch (name) {
+                case "password" :
+                    let bytes  = CryptoJS.AES.decrypt(v, '1N33dUX5t0rm!');
+                    v = bytes.toString(CryptoJS.enc.Utf8);
+                    break;
+            }
+            return v;
+        }
         if (typeof defaultValue === "undefined") return null;
         return defaultValue;
     }

@@ -10,6 +10,8 @@ import {ITableDef} from "./NowTables";
 import {NowFiles} from "./NowFiles";
 import {find} from 'lodash'
 import * as mkdirp from "mkdirp";
+import {Debug} from "./Debug";
+import {Conflicts} from "./Conflict";
 
 const EXTENSIONS = {
     html_script: "html",
@@ -20,6 +22,7 @@ const EXTENSIONS = {
 };
 
 export class NowFile {
+    private static debug = new Debug('NowFile');
     private localCRC = 0;
     // Name of the file in the filesystem
     private _fileName = "";
@@ -43,6 +46,7 @@ export class NowFile {
         //   if provided, then update the file with the content and instanceLastUpdated time.
         //       NOTE: If the content is the same then the file will not be updated
 
+        NowFile.debug.log("Creating new File");
         let mode = new SyncMode();
 
         this._crc = instanceCRC ? instanceCRC : 0;
@@ -95,12 +99,12 @@ export class NowFile {
 
                 let relSource = path.relative(base,this._fileName);
 
-                console.log('Relative path is ' + relSource);
+                NowFile.debug.log('Relative path is ' + relSource);
                 // Check and see if there is an override for this file
                 let over = find(fileOverride, { source: relSource});
                 if (over) {
                     let dest = over['dest'];
-                    console.log('Found override ' + dest );
+                    NowFile.debug.log('Found override ' + dest );
                     if (dest) {
                         if (!path.isAbsolute(dest)) {
                             dest = path.normalize(base + path.sep + dest );
@@ -111,11 +115,11 @@ export class NowFile {
                 }
                 this.processLocalFile();
                 if (this._crc !== this.localCRC) {
-                   /* console.log(
+                   NowFile.debug.log(
                         `Need to process the Instance  ${this._tableName}, ${
                             this._recordName
                             } ${this._fieldName} -> ${this._crc}  ${this.localCRC}`
-                    ); */
+                    );
                     this.processInstance();
                 } else {
                     let stats = fs.statSync(this._fileName);
@@ -168,10 +172,12 @@ export class NowFile {
     }
 
     watch() {
+        NowFile.debug.log("Add Watcher " + this._fileName, 2);
         Watcher.getWatcher().add(this._fileName);
     }
 
     unWatch() {
+        NowFile.debug.log("Remove Watcher " + this._fileName, 2);
         Watcher.getWatcher().remove(this._fileName);
     }
 
@@ -194,7 +200,7 @@ export class NowFile {
         if (sync.init) {
             // override if ininiting
             mode = sync.initMode;
-            //todo: This is na init and there is a difference.  Check and see if local file changed since last write
+            //todo: This is init and there is a difference.  Check and see if local file changed since last write
 
             // This is an init.  Lets check to see if the there is a change on the server
 
@@ -223,10 +229,19 @@ export class NowFile {
             if (client && server) {
                 // there was both a client and server change... Conflict MUST be resolved
                 if (mode == Sync.SYNC) {
-                    mode = -1;  // Ignore the pull/push for now and post sync error
-                    console.log(`SYNC ERROR for : ${this.fileName}`);
+                    // Check and see if the local file doesn't exist anymore
+                    if (fs.existsSync(this.fileName)) {
+                        // OK file exists and is different on the client too.
+                        mode = -1;  // Ignore the pull/push for now and post sync error
+                        NowFile.debug.log(`SYNC ERROR for : ${this.fileName}`);
+                        new Conflicts().add(this);  // must be done before filesReceived for callback purposes.
+                        sync.filesReceived++;  // Mark it as complete as we can't pull/push
+                    } else {
+                        // File is not local, so lets pull from server
+                        mode = Sync.PULL;
+                    }
                 }
-                // todo: post sync error
+                // IF it's not SYNC, then the methodology is PUSH or PULL and doesn't need to be changed.
             } else {
                 if (client) {
                     mode = Sync.PUSH; // Push the change
@@ -265,87 +280,18 @@ export class NowFile {
             case Sync.PUSH:
             case Sync.LOCAL:
                 // todo: push change
-                /*console.log(
+                NowFile.debug.log(
                     `Save to instance ${this._tableName}, ${this._fieldName}, ${
                         this._recordID
                         }`
                 );
-                console.log(`  ${this._fileName}`);
-                */
-                let localContents = fs.readFileSync(this._fileName);
-                if (localContents)
-                    this.api
-                        .saveFile(
-                            this._tableName,
-                            this._recordID,
-                            this._fieldName,
-                            localContents.toString()
-                        )
-                        .then(
-                            result => {
-                                sync.filesReceived++;
-                                this._crc = result.result;
-                                this.localCRC = this._crc;
-                                let stats = fs.statSync(this._fileName);
-                                fileCache.set(this._fileName, {
-                                    serverCRC: this.crc,
-                                    clientCRC: this.crc,
-                                    serverSync: parseInt(result.now, 10),
-                                    clientSync: new Date(stats.mtime+'').getTime()
-                                });
-                                Notify.message(
-                                    `${path.basename(this._fileName)}`,
-                                    "Sent to Instance"
-                                );
-                            },
-                            err => {
-                                sync.filesReceived++;
-                                console.log("Got error on getfile " + err);
-                            }
-                        );
+                NowFile.debug.log(`  ${this._fileName}`);
+                this.pushFile();
                 break;
             case Sync.PULL:
             case Sync.INSTANCE:
                 // Get the file from the server and over write the current file on the filesystem
-
-                this.api.getFile(this._tableName, this._recordID, this._fieldName).then(
-                    (results: any) => {
-                        let files = results.files;
-                        let content = files[this._fieldName];
-                        let CRC = this.calcCRC(content);
-
-                        /* console.log(
-                            `writing from server${this._fileName} -> ${
-                                this._fieldName
-                                } crc ${CRC} instance ${this._crc}`
-                        ); */
-                        this._crc = CRC;
-                        this.localCRC = CRC;
-                        let dirName = path.dirname(this._fileName);
-                        mkdirp.sync(dirName);
-                        fs.writeFileSync(this._fileName, content);
-                        this.initUpdate(2); // Done a write
-                        let stats = fs.statSync(this._fileName);
-
-                        fileCache.set(this._fileName, {
-                            serverCRC: this.crc,
-                            clientCRC: this.crc,
-                            serverSync: parseInt(results.now, 10),
-                            clientSync: new Date(stats.mtime + '').getTime()
-                        });
-                        Notify.message(
-                            `${path.basename(this._fileName)}`,
-                            "Received from Instance",
-                            "cloud-download.png"
-                        );
-
-                        sync.filesReceived++;
-                    },
-                    err => {
-                        sync.filesReceived++;
-                        console.log("Got error on getfile " + err);
-                    }
-                );
+                this.pullFile();
                 break;
         }
     }
@@ -392,5 +338,122 @@ export class NowFile {
         if (this.initProcessed & 3) {
             this.initialized = true;
         }
+    }
+
+    pushFile() {
+        let fileCache = FileCache.getFileCache();
+        let sync = SyncMode.getSyncMode();
+
+        // Push file contents to the Instance
+        NowFile.debug.log('Pushing from instance');
+
+        let localContents = fs.readFileSync(this._fileName);
+        if (localContents) {
+            this.api
+                .saveFile(
+                    this._tableName,
+                    this._recordID,
+                    this._fieldName,
+                    localContents.toString()
+                )
+                .then(
+                    result => {
+                        NowFile.debug.log("Got save response");
+                        sync.filesReceived++;
+                        this._crc = result.result;
+                        this.localCRC = this._crc;
+                        let stats = fs.statSync(this._fileName);
+                        fileCache.set(this._fileName, {
+                            serverCRC: this.crc,
+                            clientCRC: this.crc,
+                            serverSync: parseInt(result.now, 10),
+                            clientSync: new Date(stats.mtime + '').getTime()
+                        });
+                        Notify.message(
+                            `${path.basename(this._fileName)}`,
+                            "Sent to Instance"
+                        );
+                    },
+                    err => {
+                        sync.filesReceived++;
+                        console.log("Got error on getfile " + err);
+                    }
+                );
+        } else {
+            NowFile.debug.log('No content from : ' + this._fieldName);
+        }
+    }
+
+    pullFile() {
+        let fileCache = FileCache.getFileCache();
+        let sync = SyncMode.getSyncMode();
+
+        // PUll file contents from the Instance
+        NowFile.debug.log('Pulling from instance');
+
+        this.api.getFile(this._tableName, this._recordID, this._fieldName).then(
+            (results: any) => {
+                let files = results.files;
+                let content = files[this._fieldName];
+                let CRC = this.calcCRC(content);
+
+                NowFile.debug.log(
+                    `writing from server${this._fileName} -> ${
+                        this._fieldName
+                        } crc ${CRC} instance ${this._crc}`
+                );
+                this._crc = CRC;
+                this.localCRC = CRC;
+                let dirName = path.dirname(this._fileName);
+                mkdirp.sync(dirName);
+                fs.writeFileSync(this._fileName, content);
+                this.initUpdate(2); // Done a write
+                let stats = fs.statSync(this._fileName);
+
+                fileCache.set(this._fileName, {
+                    serverCRC: this.crc,
+                    clientCRC: this.crc,
+                    serverSync: parseInt(results.now, 10),
+                    clientSync: new Date(stats.mtime + '').getTime()
+                });
+                Notify.message(
+                    `${path.basename(this._fileName)}`,
+                    "Received from Instance",
+                    "cloud-download.png"
+                );
+
+                sync.filesReceived++;
+            },
+            err => {
+                sync.filesReceived++;
+                console.log("Got error on getfile " + err);
+            }
+        );
+    }
+
+    mergeFile() {
+        // Handle MERGE by getting the file contents from the Instance and store in a file with .merge extension
+        NowFile.debug.log('Merging from instance');
+
+        this.api.getFile(this._tableName, this._recordID, this._fieldName).then(
+            (results: any) => {
+                let files = results.files;
+                let content = files[this._fieldName];
+
+                NowFile.debug.log( `writing from server merge file ${this._fileName}.merge` );
+                let dirName = path.dirname(this._fileName);
+                mkdirp.sync(dirName);
+                fs.writeFileSync(this._fileName + ".merge", content);
+                Notify.message(
+                    `${path.basename(this._fileName)}`,
+                    "Received from Instance",
+                    "cloud-download.png"
+                );
+
+            },
+            err => {
+                console.log("Got error on getfile " + err);
+            }
+        );
     }
 }

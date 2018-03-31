@@ -1,4 +1,3 @@
-import {NowConnection} from "./Connection";
 import Promise = require('bluebird');
 import {Options} from "./Options";
 import _ = require('lodash');
@@ -46,11 +45,12 @@ export class NowApplications {
 
     refresh(): Promise<void> {
         let debug = this.debug;
-
+        let self = this;
         return new Promise(function (resolve, reject) {
             UXsyncNowREST.getUXsyncNowREST().getApplications()
-                .then(function(apps:{name:ApplicationDef}) {
+                .then((apps:{name:ApplicationDef}) => {
                     debug.log("Got Refresh response");
+                    self._applications = _.clone(apps);
                     let options = Options.getOptions();
                     options.set("applications", _.clone(apps));
                     options.save();
