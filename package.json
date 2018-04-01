@@ -1,6 +1,6 @@
 {
   "name": "uxsyncnow",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "UXstorm's ServiceNow file synchronizer / development tool",
   "main": "uxsyncnow.js",
   "scripts": {

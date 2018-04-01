@@ -49,7 +49,7 @@ Install from NPM
 npm install uxsyncnow -g
 ```
 
-Download the UpdateSet from [ServiceNow Share](https://share.servicenow.com).  Load the update set into your instance.  **NOTE**: This application is designed for development and should only be used in Development and Test, do not use this on a production instance.
+Download the UpdateSet from [ServiceNow Share](https://share.servicenow.com/app.do#/detailV2/c0076b7fdb4157401afe13141b9619f0/overview).  Load the update set into your instance.  **NOTE**: This application is designed for development and should only be used in Development and Test, do not use this on a production instance.
 
 Once the UpdateSet is loaded, any users that you want to use **UXsyncNow** must have two roles assigned  -- *admin* and *uxsyncnow_user_*.   If the user used to connect to the instance doesn't have these roles, the application will not connect.
 
