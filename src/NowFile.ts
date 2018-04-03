@@ -49,6 +49,9 @@ export class NowFile {
         NowFile.debug.log("Creating new File");
         let mode = new SyncMode();
 
+        if (typeof now !== "undefined") {
+            this.syncServer = now;
+        }
         this._crc = instanceCRC ? instanceCRC : 0;
         let options = Options.getOptions();
         let topDir = options.get("top_dir", "instance");
@@ -120,11 +123,13 @@ export class NowFile {
                             this._recordName
                             } ${this._fieldName} -> ${this._crc}  ${this.localCRC}`
                     );
+                   // OK the Server CRC is different than the Local CRC  Check and see if we are initing
+                    // todo: do sync for init
                     this.processInstance();
                 } else {
                     let stats = fs.statSync(this._fileName);
                     FileCache.getFileCache().set(this._fileName, {
-                        serverCRC: this.crc,
+                        serverCRC: instanceCRC,
                         clientCRC: this.crc,
                         serverSync: now ? now : -1,
                         clientSync: new Date(stats.mtime + '').getTime()
@@ -213,19 +218,22 @@ export class NowFile {
                 // There was a server changed.
                 server = true;
             }
-            if (cache.serverSync !== IGNORE && cache.serverSync !== this.syncServer) {
+
+/*            if (cache.serverSync !== IGNORE && cache.serverSync !== this.syncServer) {
                 // There was a server changed.
                 server = true;
             }
-            if (cache.clientCRC !== IGNORE && cache.clientCRC !== this.crc) {
+*/
+            if (cache.clientCRC !== IGNORE && cache.clientCRC !== this.localCRC) {
                 // There was a client changed.
                 client = true;
             }
+/*
             if (cache.clientSync !== IGNORE && cache.clientSync !== this.syncLocal) {
                 // There was a client changed.
                 client = true;
             }
-
+*/
             if (client && server) {
                 // there was both a client and server change... Conflict MUST be resolved
                 if (mode == Sync.SYNC) {
@@ -261,7 +269,8 @@ export class NowFile {
                 mode = Sync.PUSH;
             } else if (change == "instance") {
                 mode = Sync.PULL;
-            } else if (this.syncLocal === 0) {
+            }
+            /*else if (this.syncLocal === 0) {
                 // This is the first sync from the server so change to Instance
                 mode = Sync.INSTANCE;
             } else if (this.syncServer === 0) {
@@ -274,6 +283,7 @@ export class NowFile {
                     // One of the syncs is not set.
                 }
             }
+            */
         }
 
         switch (mode) {
