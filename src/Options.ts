@@ -7,10 +7,10 @@ import * as CryptoJS from "crypto-js";
 export class Options {
     private static singleton: Options = null;
     private options: any = {
-        host: "uxstormdev5.service-now.com",
-        protocol: "http",
+        host: "",
+        protocol: "https",
         port: 0,
-        user: "resttest",
+        user: "",
         password: "",
         applications: [],
         app: "",
@@ -19,7 +19,7 @@ export class Options {
         interval: 30000,
         connection_max: 0,
         connection_wait: 0,
-        top_dir: "testdir",
+        top_dir: "",
         table_ignore: [],
         table_error: [],
         file_override: [],
