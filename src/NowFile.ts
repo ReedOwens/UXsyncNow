@@ -18,6 +18,7 @@ const EXTENSIONS = {
     script: "js",
     script_plain: "js",
     html: "html",
+    html_template: "html",
     xml: "xml"
 };
 
