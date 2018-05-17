@@ -19,6 +19,7 @@ const EXTENSIONS = {
     script_plain: "js",
     html: "html",
     html_template: "html",
+    css: "css",
     xml: "xml"
 };
 
