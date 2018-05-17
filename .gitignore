@@ -10,7 +10,6 @@ wijmo-amd-src
 wijmo-amd-min
 src/**/*.js
 src/**/*.map
-dist
 
 typings
 .sync_data
