@@ -165,6 +165,7 @@ export class Options {
         try {
             jsonfile.writeFileSync(this.configFile, this.options, {
                 spaces: 2,
+                'flag': 'w',
                 EOL: "\r\n"
             });
         } catch (err) {
