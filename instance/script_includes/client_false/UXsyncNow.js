@@ -52,7 +52,7 @@ UXsyncNow.prototype = {
         var unmappedTables = {};
         var nonApplicationTables = {};
         var gr = new GlideRecord('sys_dictionary');
-        gr.addEncodedQuery("internal_type=html_script^ORinternal_type=script^ORinternal_type=script_plain^ORinternal_type=html^ORinternal_type=xml");
+        gr.addEncodedQuery("internal_type=html_template^ORinternal_type=css^internal_type=html_script^ORinternal_type=script^ORinternal_type=script_plain^ORinternal_type=html^ORinternal_type=xml");
         gr.query();
         var numOfFields = 0;
         while (gr.next()) {

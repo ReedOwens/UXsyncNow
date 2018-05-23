@@ -14,10 +14,15 @@ var mkdirp = require("mkdirp");
 var Debug_1 = require("./Debug");
 var Conflict_1 = require("./Conflict");
 var EXTENSIONS = {
+    html_template: "html",
     html_script: "html",
+    html: "html",
+    translated_html: "html",
+    css: "css",
+    "json": "js",
     script: "js",
     script_plain: "js",
-    html: "html",
+    script_server: "js",
     xml: "xml"
 };
 var NowFile = /** @class */ (function () {
