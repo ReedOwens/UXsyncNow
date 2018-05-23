@@ -14,10 +14,15 @@ import {Debug} from "./Debug";
 import {Conflicts} from "./Conflict";
 
 const EXTENSIONS = {
+    html_template: "html",
     html_script: "html",
+    html: "html",
+    translated_html: "html",
+    css: "css",
+    "json": "js",
     script: "js",
     script_plain: "js",
-    html: "html",
+    script_server: "js",
     xml: "xml"
 };
 

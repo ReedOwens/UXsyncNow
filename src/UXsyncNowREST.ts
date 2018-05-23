@@ -71,7 +71,6 @@ export class UXsyncNowREST {
             let valid = true;
             let message = [];
             let self = this;
-
             _.each(['host', 'protocol', 'user', 'password'], (name) => {
                 if (this._options.get(name, '') === '') {
                     valid = false;
@@ -96,7 +95,7 @@ export class UXsyncNowREST {
                                     this._errorMessage = 'Either the username or password is incorrect';
                                 }
                                 if (this._errorMessage.indexOf("Requested URI does not represent any resource:") >= 0) {
-                                    this._errorMessage = "Instance does not contain UXsyncNow REST services.  Is the UXsyncNow Application installed on the instance?";
+                                    this._errorMessage = "Instance does not contain UXsyncNow REST services.  Is the UXsyncNow Application installed on the instance?\nYou can download the UpdateSet from https://share.servicenow.com/app.do#/detailV2/c0076b7fdb4157401afe13141b9619f0/overview";
                                 }
                                 // todo: Check for other errors
                                 resolve();

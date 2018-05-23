@@ -125,20 +125,23 @@ If a work area has already been setup, then all you need to do is run **uxsyncno
 
 # Command Line Options
 
-**uxsyncnow** supports both short and long format for the command line options.  Short options are one char and are preceded by a single -.  Long options are words and preceded by two -.
+**uxsyncnow** supports both short and long format for the command line options.  Short options are one char and are preceded by a single -.  Long options are words and preceded by two -
 
-| Option                                   | Description                             |
-| :----------------------------------- | :-------------------------------------|
-|-a *\<areas>**, --areas  *\<areas>* | Specifies the areas in the application that the debug statements will be printed.  *\<areas>* is a comma decimated list of the areas.  *See debug areas Application Command for list of areas* |
-|-c *\<type>*, --config *\<type>* | Specifies the type of configuration to use by *\<type>* |
-| -d *num*, --debug *num* | Sets the debug level to *num* |
-| -h, --help | Prints out help information |
-| -p         | Specifies to to use the production configuration |
-| --pull   | Uses PULL for the sync method |
-| --push  | Uses PUSH for the sync method |
-| --sync   | Uses SYNC for the sync method.  This is the default method |
-| --nowatch | Causes the application only to process the synchronizationn of the work area and doesn't watch for changes on the instance or the work area.  When the synchronizationn is done, then the application will exit
- 
+
+
+| Option                              | Description
+| ----------------------------------- | -------------------------------------
+| -a *areas*, --areas  *areas* | Specifies the areas in the application that the debug statements will be printed.  *areas* is a comma decimated list of the areas.  *See debug areas Application Command for list of areas*
+| -c *type*, --config *type*    | Specifies the type of configuration to use by *type*
+| -d *num*, --debug *num*             | Sets the debug level to *num*
+| -h, --help                          | Prints out help information
+| -p                                  | Specifies to to use the production configuration
+| --pull                              | Uses PULL for the sync method
+| --push                              | Uses PUSH for the sync method
+| --sync                              | Uses SYNC for the sync method.  This is the default method
+| --nowatch                           | Causes the application only to process the synchronization of the work area and doesn't watch for changes on the instance or the work area.  When the synchronization is done, then the application will exit
+
+
 # Application Command Line 
 **uxsyncnow** provides an application command line interface to interact with the application.   When the application is started you will receive a command prompt `uxsyncnow:` and can run any of the application commands via this interface.  Try `help` to get started.
 
