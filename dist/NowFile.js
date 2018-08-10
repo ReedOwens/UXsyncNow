@@ -25,6 +25,7 @@ var EXTENSIONS = {
     script_server: "js",
     xml: "xml"
 };
+var BUNDLED_TABLES = ["sp_widget"];
 var NowFile = /** @class */ (function () {
     function NowFile(_applicationName, _tableName, _recordID, _recordName, _fieldName, instanceCRC, now) {
         // Determine path
@@ -78,19 +79,37 @@ var NowFile = /** @class */ (function () {
             else {
                 var extension = EXTENSIONS[field.type];
                 var base = path.normalize(basedir);
-                this._fileName = path.normalize(base +
-                    path.sep +
-                    topDir +
-                    path.sep +
-                    _applicationName +
-                    path.sep +
-                    _tableName +
-                    path.sep +
-                    _recordName +
-                    "_" +
-                    _fieldName +
-                    "." +
-                    extension);
+                //place widget files in a folder together
+                if (BUNDLED_TABLES.indexOf(_tableName) > -1) {
+                    this._fileName = path.normalize(base +
+                        path.sep +
+                        topDir +
+                        path.sep +
+                        _applicationName +
+                        path.sep +
+                        _tableName +
+                        path.sep +
+                        _recordName +
+                        path.sep +
+                        _fieldName +
+                        "." +
+                        extension);
+                }
+                else {
+                    this._fileName = path.normalize(base +
+                        path.sep +
+                        topDir +
+                        path.sep +
+                        _applicationName +
+                        path.sep +
+                        _tableName +
+                        path.sep +
+                        _recordName +
+                        "_" +
+                        _fieldName +
+                        "." +
+                        extension);
+                }
                 var relSource = path.relative(base, this._fileName);
                 NowFile.debug.log('Relative path is ' + relSource);
                 // Check and see if there is an override for this file
