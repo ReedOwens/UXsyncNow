@@ -87,11 +87,16 @@ export class NowFile {
                 mode.filesReceived++;
                 // todo: handle error
             } else {
+                let multifile = options.get('multifile', 'record').toLowerCase();
+                let mmode = 'record'
+                if (multifile === 'flat') mmode = 'flat';
+                if (multifile === 'field') mmode = 'field';
+
                 let extension = EXTENSIONS[field.type];
                 let base = path.normalize(basedir);
-                if (table.fields.length > 1) {
+                if (table.fields.length > 1 && mmode !== 'flat') {
                     // This table has multiple fields
-                    if (1 === 1) {
+                    if (mmode === 'record') {
                         this._fileName = path.normalize(
                             base +
                             path.sep +
@@ -125,21 +130,38 @@ export class NowFile {
                         );
                     }
                 } else {
-                    this._fileName = path.normalize(
-                        base +
-                        path.sep +
-                        topDir +
-                        path.sep +
-                        _applicationName +
-                        path.sep +
-                        _tableName +
-                        path.sep +
-                        recordName +
-                        "_" +
-                        _fieldName +
-                        "." +
-                        extension
-                    );
+                    // If flat use the original method otherwise remove the field name
+                    if (mmode === 'flat') {
+                        this._fileName = path.normalize(
+                            base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            recordName +
+                            "_" +
+                            _fieldName +
+                            "." +
+                            extension
+                        );
+                    } else {
+                        this._fileName = path.normalize(
+                            base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            recordName +
+                            "." +
+                            extension
+                        );
+                    }
                 }
 
                 let relSource = path.relative(base, this._fileName);

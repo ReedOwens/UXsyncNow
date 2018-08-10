@@ -82,6 +82,7 @@ api.init()
     .then(() => {
         let apps = options.get('applications', {});
         let tables = options.get('tables', {});
+        let multifile = options.get('multifile', 'record');
         let app = null;
         let appWatcher: AppWatcher;
 

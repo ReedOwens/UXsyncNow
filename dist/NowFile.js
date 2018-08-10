@@ -37,13 +37,13 @@ var NowFile = /** @class */ (function () {
         this._recordName = _recordName;
         this._fieldName = _fieldName;
         this.localCRC = 0;
-        // Name of the file in the filesystem
-        this._fileName = "";
         this.initialized = false;
         this.initProcessed = 0;
         this.api = UXsyncNowREST_1.UXsyncNowREST.getUXsyncNowREST();
         this.syncLocal = 0;
         this.syncServer = 0;
+        // Name of the file in the filesystem
+        this._fileName = "";
         this._crc = 0;
         NowFile.debug.log("Creating new File");
         var mode = new SyncMode_1.SyncMode();
@@ -69,6 +69,7 @@ var NowFile = /** @class */ (function () {
             mode.filesReceived++;
         }
         else {
+            var recordName = _recordName.replace(/[\\\/]/gm, '_');
             var field = lodash_1.find(table.fields, { name: this._fieldName });
             if (!field) {
                 console.log("ERROR: " + _fieldName + " was not found in " + _tableName);
@@ -76,21 +77,78 @@ var NowFile = /** @class */ (function () {
                 // todo: handle error
             }
             else {
+                var multifile = options.get('multifile', 'record').toLowerCase();
+                var mmode = 'record';
+                if (multifile === 'flat')
+                    mmode = 'flat';
+                if (multifile === 'field')
+                    mmode = 'field';
                 var extension = EXTENSIONS[field.type];
                 var base = path.normalize(basedir);
-                this._fileName = path.normalize(base +
-                    path.sep +
-                    topDir +
-                    path.sep +
-                    _applicationName +
-                    path.sep +
-                    _tableName +
-                    path.sep +
-                    _recordName +
-                    "_" +
-                    _fieldName +
-                    "." +
-                    extension);
+                if (table.fields.length > 1 && mmode !== 'flat') {
+                    // This table has multiple fields
+                    if (mmode === 'record') {
+                        this._fileName = path.normalize(base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            recordName +
+                            path.sep +
+                            _fieldName +
+                            "." +
+                            extension);
+                    }
+                    else {
+                        this._fileName = path.normalize(base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            _fieldName +
+                            path.sep +
+                            recordName +
+                            "." +
+                            extension);
+                    }
+                }
+                else {
+                    // If flat use the original method otherwise remove the field name
+                    if (mmode === 'flat') {
+                        this._fileName = path.normalize(base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            recordName +
+                            "_" +
+                            _fieldName +
+                            "." +
+                            extension);
+                    }
+                    else {
+                        this._fileName = path.normalize(base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            recordName +
+                            "." +
+                            extension);
+                    }
+                }
                 var relSource = path.relative(base, this._fileName);
                 NowFile.debug.log('Relative path is ' + relSource);
                 // Check and see if there is an override for this file
@@ -127,6 +185,23 @@ var NowFile = /** @class */ (function () {
             }
         }
     }
+    Object.defineProperty(NowFile.prototype, "fileName", {
+        get: function () {
+            return this._fileName;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(NowFile.prototype, "crc", {
+        get: function () {
+            return this._crc;
+        },
+        set: function (value) {
+            this._crc = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(NowFile.prototype, "applicationName", {
         get: function () {
             return this._applicationName;
@@ -158,23 +233,6 @@ var NowFile = /** @class */ (function () {
     Object.defineProperty(NowFile.prototype, "fieldName", {
         get: function () {
             return this._fieldName;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NowFile.prototype, "fileName", {
-        get: function () {
-            return this._fileName;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(NowFile.prototype, "crc", {
-        get: function () {
-            return this._crc;
-        },
-        set: function (value) {
-            this._crc = value;
         },
         enumerable: true,
         configurable: true
@@ -300,42 +358,6 @@ var NowFile = /** @class */ (function () {
                 break;
         }
     };
-    /**
-     * Calculate a 32 bit FNV-1a hash
-     * Found here: https://gist.github.com/vaiorabbit/5657561
-     * Ref.: http://isthe.com/chongo/tech/comp/fnv/
-     *
-     * @param {string} str the input value
-     * @param {boolean} [asString=false] set to true to return the hash value as
-     *     8-digit hex string instead of an integer
-     * @param {integer} [seed] optionally pass the hash of the previous chunk
-     * @returns {integer | string}
-     */
-    NowFile.prototype.hashFnv32a = function (str) {
-        /*jshint bitwise:false */
-        var i, l, hval = 0x811c9dc5;
-        for (i = 0, l = str.length; i < l; i++) {
-            hval ^= str.charCodeAt(i);
-            hval +=
-                (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        return hval >>> 0;
-    };
-    NowFile.prototype.calcCRC = function (str) {
-        return this.hashFnv32a(str);
-    };
-    /**
-     * Update the cache with the current information
-     */
-    NowFile.prototype.updateCache = function () {
-        //        getCache().update(this.filename, this.localCRC, this.crc, this.syncLocal, this.syncServer);
-    };
-    NowFile.prototype.initUpdate = function (val) {
-        this.initProcessed |= val;
-        if (this.initProcessed & 3) {
-            this.initialized = true;
-        }
-    };
     NowFile.prototype.pushFile = function () {
         var _this = this;
         var fileCache = FileCache_1.FileCache.getFileCache();
@@ -414,6 +436,42 @@ var NowFile = /** @class */ (function () {
         }, function (err) {
             console.log("Got error on getfile " + err);
         });
+    };
+    /**
+     * Calculate a 32 bit FNV-1a hash
+     * Found here: https://gist.github.com/vaiorabbit/5657561
+     * Ref.: http://isthe.com/chongo/tech/comp/fnv/
+     *
+     * @param {string} str the input value
+     * @param {boolean} [asString=false] set to true to return the hash value as
+     *     8-digit hex string instead of an integer
+     * @param {integer} [seed] optionally pass the hash of the previous chunk
+     * @returns {integer | string}
+     */
+    NowFile.prototype.hashFnv32a = function (str) {
+        /*jshint bitwise:false */
+        var i, l, hval = 0x811c9dc5;
+        for (i = 0, l = str.length; i < l; i++) {
+            hval ^= str.charCodeAt(i);
+            hval +=
+                (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+        }
+        return hval >>> 0;
+    };
+    NowFile.prototype.calcCRC = function (str) {
+        return this.hashFnv32a(str);
+    };
+    /**
+     * Update the cache with the current information
+     */
+    NowFile.prototype.updateCache = function () {
+        //        getCache().update(this.filename, this.localCRC, this.crc, this.syncLocal, this.syncServer);
+    };
+    NowFile.prototype.initUpdate = function (val) {
+        this.initProcessed |= val;
+        if (this.initProcessed & 3) {
+            this.initialized = true;
+        }
     };
     NowFile.debug = new Debug_1.Debug('NowFile');
     return NowFile;

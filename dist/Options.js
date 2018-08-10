@@ -39,7 +39,8 @@ var Options = /** @class */ (function () {
             connection_max: "Maximum amount of connections to your instance.  0 is unlimited.",
             connection_wait: "Time in milliseconds to wait between each connection to your instance. ",
             top_dir: "The top directory where all the applications that are synced will be stored in the filesystem.",
-            interval: "The interval in ms between checking the instance for any file changes.  Default is 30000 or 30 seconds."
+            interval: "The interval in ms between checking the instance for any file changes.  Default is 30000 or 30 seconds.",
+            multifile: "How to handle records with multiple files.  flat for the flat method.  record to have all files under a directory with the record name.  field to have a directory per field name and the files in that directory with the record name."
         };
         this.configFile = "";
         this.configFileDir = "";
