@@ -29,8 +29,6 @@ const EXTENSIONS = {
 export class NowFile {
     private static debug = new Debug('NowFile');
     private localCRC = 0;
-    // Name of the file in the filesystem
-    private _fileName = "";
     private initialized = false;
     private initProcessed = 0;
     private api = UXsyncNowREST.getUXsyncNowREST();
@@ -61,7 +59,7 @@ export class NowFile {
         let options = Options.getOptions();
         let topDir = options.get("top_dir", "instance");
         let basedir = options.get("base_dir", "./");
-        let fileOverride = options.get( "file_override", []);
+        let fileOverride = options.get("file_override", []);
 
         // Get the cached info on the local/instance crc and sync times
 
@@ -73,7 +71,7 @@ export class NowFile {
         // Todo: add File location override
 
         let tables: ITableDef[] = options.get("tables", {});
-        let table: ITableDef = find(tables, { name: _tableName });
+        let table: ITableDef = find(tables, {name: _tableName});
         if (!table) {
             // todo: Handle error
             console.log(
@@ -81,7 +79,9 @@ export class NowFile {
             );
             mode.filesReceived++;
         } else {
-            let field = find(table.fields, { name: this._fieldName });
+            let recordName = _recordName.replace(/[\\\/]/gm, '_');
+
+            let field = find(table.fields, {name: this._fieldName});
             if (!field) {
                 console.log(`ERROR: ${_fieldName} was not found in ${_tableName}`);
                 mode.filesReceived++;
@@ -89,33 +89,70 @@ export class NowFile {
             } else {
                 let extension = EXTENSIONS[field.type];
                 let base = path.normalize(basedir);
-                this._fileName = path.normalize(
-                    base +
-                    path.sep +
-                    topDir +
-                    path.sep +
-                    _applicationName +
-                    path.sep +
-                    _tableName +
-                    path.sep +
-                    _recordName +
-                    "_" +
-                    _fieldName +
-                    "." +
-                    extension
-                );
+                if (table.fields.length > 1) {
+                    // This table has multiple fields
+                    if (1 === 1) {
+                        this._fileName = path.normalize(
+                            base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            recordName +
+                            path.sep +
+                            _fieldName +
+                            "." +
+                            extension
+                        );
+                    } else {
+                        this._fileName = path.normalize(
+                            base +
+                            path.sep +
+                            topDir +
+                            path.sep +
+                            _applicationName +
+                            path.sep +
+                            _tableName +
+                            path.sep +
+                            _fieldName +
+                            path.sep +
+                            recordName +
+                            "." +
+                            extension
+                        );
+                    }
+                } else {
+                    this._fileName = path.normalize(
+                        base +
+                        path.sep +
+                        topDir +
+                        path.sep +
+                        _applicationName +
+                        path.sep +
+                        _tableName +
+                        path.sep +
+                        recordName +
+                        "_" +
+                        _fieldName +
+                        "." +
+                        extension
+                    );
+                }
 
-                let relSource = path.relative(base,this._fileName);
+                let relSource = path.relative(base, this._fileName);
 
                 NowFile.debug.log('Relative path is ' + relSource);
                 // Check and see if there is an override for this file
-                let over = find(fileOverride, { source: relSource});
+                let over = find(fileOverride, {source: relSource});
                 if (over) {
                     let dest = over['dest'];
-                    NowFile.debug.log('Found override ' + dest );
+                    NowFile.debug.log('Found override ' + dest);
                     if (dest) {
                         if (!path.isAbsolute(dest)) {
-                            dest = path.normalize(base + path.sep + dest );
+                            dest = path.normalize(base + path.sep + dest);
                         }
                     }
                     console.log('Map to ' + dest);
@@ -123,12 +160,12 @@ export class NowFile {
                 }
                 this.processLocalFile();
                 if (this._crc !== this.localCRC) {
-                   NowFile.debug.log(
+                    NowFile.debug.log(
                         `Need to process the Instance  ${this._tableName}, ${
                             this._recordName
                             } ${this._fieldName} -> ${this._crc}  ${this.localCRC}`
                     );
-                   // OK the Server CRC is different than the Local CRC  Check and see if we are initing
+                    // OK the Server CRC is different than the Local CRC  Check and see if we are initing
                     // todo: do sync for init
                     this.processInstance();
                 } else {
@@ -147,7 +184,22 @@ export class NowFile {
         }
     }
 
+    // Name of the file in the filesystem
+    private _fileName = "";
+
+    get fileName(): string {
+        return this._fileName;
+    }
+
     private _crc = 0;
+
+    get crc(): number {
+        return this._crc;
+    }
+
+    set crc(value: number) {
+        this._crc = value;
+    }
 
     get applicationName(): string {
         return this._applicationName;
@@ -167,18 +219,6 @@ export class NowFile {
 
     get fieldName(): string {
         return this._fieldName;
-    }
-
-    get fileName(): string {
-        return this._fileName;
-    }
-
-    get crc(): number {
-        return this._crc;
-    }
-
-    set crc(value: number) {
-        this._crc = value;
     }
 
     watch() {
@@ -224,21 +264,21 @@ export class NowFile {
                 server = true;
             }
 
-/*            if (cache.serverSync !== IGNORE && cache.serverSync !== this.syncServer) {
-                // There was a server changed.
-                server = true;
-            }
-*/
+            /*            if (cache.serverSync !== IGNORE && cache.serverSync !== this.syncServer) {
+                            // There was a server changed.
+                            server = true;
+                        }
+            */
             if (cache.clientCRC !== IGNORE && cache.clientCRC !== this.localCRC) {
                 // There was a client changed.
                 client = true;
             }
-/*
-            if (cache.clientSync !== IGNORE && cache.clientSync !== this.syncLocal) {
-                // There was a client changed.
-                client = true;
-            }
-*/
+            /*
+                        if (cache.clientSync !== IGNORE && cache.clientSync !== this.syncLocal) {
+                            // There was a client changed.
+                            client = true;
+                        }
+            */
             if (client && server) {
                 // there was both a client and server change... Conflict MUST be resolved
                 if (mode == Sync.SYNC) {
@@ -308,50 +348,6 @@ export class NowFile {
                 // Get the file from the server and over write the current file on the filesystem
                 this.pullFile();
                 break;
-        }
-    }
-
-    /**
-     * Calculate a 32 bit FNV-1a hash
-     * Found here: https://gist.github.com/vaiorabbit/5657561
-     * Ref.: http://isthe.com/chongo/tech/comp/fnv/
-     *
-     * @param {string} str the input value
-     * @param {boolean} [asString=false] set to true to return the hash value as
-     *     8-digit hex string instead of an integer
-     * @param {integer} [seed] optionally pass the hash of the previous chunk
-     * @returns {integer | string}
-     */
-    private hashFnv32a(str: string): number {
-        /*jshint bitwise:false */
-        var i,
-            l,
-            hval = 0x811c9dc5;
-
-        for (i = 0, l = str.length; i < l; i++) {
-            hval ^= str.charCodeAt(i);
-            hval +=
-                (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-        }
-        return hval >>> 0;
-    }
-
-    private calcCRC(str: string): number {
-        return this.hashFnv32a(str);
-    }
-
-    /**
-     * Update the cache with the current information
-     */
-
-    private updateCache() {
-        //        getCache().update(this.filename, this.localCRC, this.crc, this.syncLocal, this.syncServer);
-    }
-
-    private initUpdate(val: number) {
-        this.initProcessed |= val;
-        if (this.initProcessed & 3) {
-            this.initialized = true;
         }
     }
 
@@ -455,7 +451,7 @@ export class NowFile {
                 let files = results.files;
                 let content = files[this._fieldName];
 
-                NowFile.debug.log( `writing from server merge file ${this._fileName}.merge` );
+                NowFile.debug.log(`writing from server merge file ${this._fileName}.merge`);
                 let dirName = path.dirname(this._fileName);
                 mkdirp.sync(dirName);
                 fs.writeFileSync(this._fileName + ".merge", content);
@@ -470,5 +466,49 @@ export class NowFile {
                 console.log("Got error on getfile " + err);
             }
         );
+    }
+
+    /**
+     * Calculate a 32 bit FNV-1a hash
+     * Found here: https://gist.github.com/vaiorabbit/5657561
+     * Ref.: http://isthe.com/chongo/tech/comp/fnv/
+     *
+     * @param {string} str the input value
+     * @param {boolean} [asString=false] set to true to return the hash value as
+     *     8-digit hex string instead of an integer
+     * @param {integer} [seed] optionally pass the hash of the previous chunk
+     * @returns {integer | string}
+     */
+    private hashFnv32a(str: string): number {
+        /*jshint bitwise:false */
+        var i,
+            l,
+            hval = 0x811c9dc5;
+
+        for (i = 0, l = str.length; i < l; i++) {
+            hval ^= str.charCodeAt(i);
+            hval +=
+                (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+        }
+        return hval >>> 0;
+    }
+
+    private calcCRC(str: string): number {
+        return this.hashFnv32a(str);
+    }
+
+    /**
+     * Update the cache with the current information
+     */
+
+    private updateCache() {
+        //        getCache().update(this.filename, this.localCRC, this.crc, this.syncLocal, this.syncServer);
+    }
+
+    private initUpdate(val: number) {
+        this.initProcessed |= val;
+        if (this.initProcessed & 3) {
+            this.initialized = true;
+        }
     }
 }

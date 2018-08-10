@@ -24,6 +24,7 @@ UXsyncNow.prototype = {
             for (var table in tableHash) if (table === name) return true;
             return false;
         }
+
         function hasScope(table) {
             var gr = new GlideRecord(table);
             gr.initialize();
@@ -155,7 +156,8 @@ UXsyncNow.prototype = {
                 var nonBlankFields = [];
                 var crc = [];
                 for (var i = 0; i < fields.length; i++) {
-                    if (gr[fields[i].name].getDisplayValue() != '') {
+                    // if (gr[fields[i].name].getDisplayValue() != '') {
+                    if (!this.isBlank(gr[fields[i].name].getDisplayValue(), fields[i].type)) {
                         // have content
                         nonBlankFields.push(fields[i].name);
                         crc.push(this.crc(gr[fields[i].name].getDisplayValue()));
@@ -166,6 +168,35 @@ UXsyncNow.prototype = {
             }
         }
         return files;
+    },
+    getBlankTemplates: function (type) {
+        if (type === 'script' || type === 'script_plain' || type === 'script_server') {
+            return [
+                // For UI Policies
+                "function onCondition() {\n" +
+                "\n" +
+                "}",
+                // For business rules
+                "(function executeRule(current, previous /*null when async*/) {\n" +
+                "\n" +
+                "\t// Add your code here\n" +
+                "\n" +
+                "})(current, previous);"
+            ]
+        }
+        return [];
+    },
+    isBlank: function (value, type) {
+        // Check for fields with blank values so we know they have no data in them.
+        // Some fields have data but are "blank" templates.  We should ignore them too
+
+        if (value === "") return true;
+        var blanks = this.getBlankTemplates(type);
+        for (var i = 0; i < blanks.length; i++)
+            if (blanks[i] === value) {
+                return true;
+            }
+        return false;
     },
     validUserDetail: function () {
         var result = "SUCCESS";
