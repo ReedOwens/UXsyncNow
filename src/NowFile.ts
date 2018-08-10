@@ -26,6 +26,8 @@ const EXTENSIONS = {
     xml: "xml"
 };
 
+const BUNDLED_TABLES = ["sp_widget"];
+
 export class NowFile {
     private static debug = new Debug('NowFile');
     private localCRC = 0;
@@ -89,21 +91,42 @@ export class NowFile {
             } else {
                 let extension = EXTENSIONS[field.type];
                 let base = path.normalize(basedir);
-                this._fileName = path.normalize(
-                    base +
-                    path.sep +
-                    topDir +
-                    path.sep +
-                    _applicationName +
-                    path.sep +
-                    _tableName +
-                    path.sep +
-                    _recordName +
-                    "_" +
-                    _fieldName +
-                    "." +
-                    extension
-                );
+                //place widget files in a folder together
+                if(BUNDLED_TABLES.indexOf(_tableName) > -1){
+                    this._fileName = path.normalize(
+                        base +
+                        path.sep +
+                        topDir +
+                        path.sep +
+                        _applicationName +
+                        path.sep +
+                        _tableName +
+                        path.sep +
+                        _recordName +
+                        path.sep +
+                        _fieldName +
+                        "." +
+                        extension
+                    );
+                }
+                else{
+                    this._fileName = path.normalize(
+                        base +
+                        path.sep +
+                        topDir +
+                        path.sep +
+                        _applicationName +
+                        path.sep +
+                        _tableName +
+                        path.sep +
+                        _recordName +
+                        "_" +
+                        _fieldName +
+                        "." +
+                        extension
+                    );
+                }
+                
 
                 let relSource = path.relative(base,this._fileName);
 
