@@ -22,10 +22,11 @@ let debug = new Debug('main');
 
 let args = minimist(process.argv.slice(2), {
     string: ['config', 'd', 'a'],
-    boolean: ['prod', 'pull', 'push', 'sync', 'nowatch'],
+    boolean: ['prod', 'pull', 'push', 'sync', 'nowatch', 'noinit'],
     alias: {'h': 'help', 'p': 'prod', 'c': 'config', 'd': 'debug', 'a': 'areas'},
     default: {
         areas: '',
+        noinit: false,
         debug: '0',
         c: 'dev',
         pull: false,
@@ -81,6 +82,7 @@ api.init()
     .then(() => {
         let apps = options.get('applications', {});
         let tables = options.get('tables', {});
+        let multifile = options.get('multifile', 'record');
         let app = null;
         let appWatcher: AppWatcher;
 
@@ -139,7 +141,11 @@ api.init()
 
         // init lists for first time
         if (api.connected) {
-            initSetup();
+            if (args.noinit) {
+                console.log("You are connected but no synchronization is started.  Use command 'sync' to start synchronization.");
+            } else {
+                initSetup();
+            }
         } else {
             console.log("You are not connected to your instance.  Please setup your connection.");
             console.log(api.errorMessage);

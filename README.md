@@ -40,6 +40,14 @@ To solve these issues, we've developed an internal too, **UXsyncNow**
 	*  Push the files from the local work area to the instance.  We uses this for production builds to our Integration Instance
 *    Can override a *file* from the Instance to be stored/watched in another location.  This is useful for specifying files from a build/generate area to the appropriate ServiceNow file.  We use this for our WebPack bundles to UI Scripts.
 *    Supports using a Proxy Server
+
+
+# BREAKING CHANGES
+
+If you are upgrading from the pre-release, please read CHANGELOG.md.   There are breaking changes if you are using a previous release and steps to keep old functionality or migrate to the new functionality is documented in that file.
+
+[CHANGELOG.md](https://github.com/ReedOwens/UXsyncNow/blob/1.0/CHANGELOG.md)
+
 # Initial Setup
 
 ## Installation
@@ -140,7 +148,7 @@ If a work area has already been setup, then all you need to do is run **uxsyncno
 | --push                              | Uses PUSH for the sync method
 | --sync                              | Uses SYNC for the sync method.  This is the default method
 | --nowatch                           | Causes the application only to process the synchronization of the work area and doesn't watch for changes on the instance or the work area.  When the synchronization is done, then the application will exit
-
+| --noinit                            | Connect to the instance but do not initialize the sync engine.   Use this during upgrades to connect and set options before the synchronization starts.
 
 # Application Command Line 
 **uxsyncnow** provides an application command line interface to interact with the application.   When the application is started you will receive a command prompt `uxsyncnow:` and can run any of the application commands via this interface.  Try `help` to get started.
@@ -253,18 +261,20 @@ Valid options are:
 
 | Option | Description |
 | :--------- | :----------------|
-|connection_max  | Maximum number of connections to the ServiceNow instance.   If you experience problems with too many connections then you can change to number something low like 5 or less and see if it fixes your experience.   A value of 0 defaults to the system's default number of connections. |
+| connection_max  | Maximum number of connections to the ServiceNow instance.   If you experience problems with too many connections then you can change to number something low like 5 or less and see if it fixes your experience.   A value of 0 defaults to the system's default number of connections. |
 | connection_wait | Number of milli seconds to wait between requests.  This is used not to throttle the instance with too many requests at a time.  A value of 0 defaults to the systems' default wait time.|
 | host                        | The host name of the ServiceNow Instance |
 | interval                  | How many milli seconds to wait between checking the instance for any changes.   The default is 30000 or 30 seconds.  You can not set this to value less than 1 second (1000).   |
+| multifile                   | Specifies how to handle multiple *file* fields on a table.  All files are stored under the table directory, when there are multiple fields that can be files, then they must be separated.   There are three separation modes. <br/> <br/> <ul> <li>**flat** will store all files directly in same directory with a name of the *Record Name*\_*Field Name*\.*extension*.</li> <li> **directory** will create a directory with the *Record Name* and contain a file for each *file* with the *Field Name*\.*extension*.</li>  **field** will create a directory for each field with the field name and have a file for each *file* with the *Record Name*\.*extension*</ul>
 | password               |  Password of the user to connect to the ServiceNow instance.  NOTE:  This value is encrypted and you can never see it's value.|
 | port                         |  Port to use to connect to the ServiceNow instance.  A value of 0 specifies to use the default port.|
-|protocol                    | The web protocol to use for the ServiceNow instance.  This can be either http or https.  The default is https |
+| protocol                    | The web protocol to use for the ServiceNow instance.  This can be either http or https.  The default is https |
 | proxy                        | Specifies a Web Proxy server to send all requests through. |
+| table_dir                     |  Specifies the name of each directory created for the tables.  Default is to use the Label for the table but it can be chanced to use the database name.   Use **label** to use the Label for the table.  Use **name** to use the Database Name.
 | top_dir                     |  By default, all the directories of files from the instance will be created in the current directory where **uxsyncnow** is ran.  If you want to have the instance directories and files in a subdirectory, you can do this by specifying the top_dir.  This will create a directory as specified and will contain work area._|
 |  user                           | The username of the ServiceNow user to connect to the instance.   NOTE: This user must have the roles of **admin** and **uxsyncnow_user** |
 
 ## sync
 
-Synchronizes the local work area and the Application files on the instance.  It uses the current synchronizationn mode.  NOTE:  This only needs to be used during first initialization or if you make any configuration changes requiring a re-sync.  By default, **uxsyncnow** starts up in sync mode if it can connect to the instance and an application was set.
+Synchronizes the local work area and the Application files on the instance.  It uses the current synchronization mode.  NOTE:  This only needs to be used during first initialization or if you make any configuration changes requiring a re-sync.  By default, **uxsyncnow** starts up in sync mode if it can connect to the instance and an application was set.
 

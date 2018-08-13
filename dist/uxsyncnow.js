@@ -20,10 +20,11 @@ var debug = new Debug_1.Debug('main');
 // Process the command line
 var args = minimist(process.argv.slice(2), {
     string: ['config', 'd', 'a'],
-    boolean: ['prod', 'pull', 'push', 'sync', 'nowatch'],
+    boolean: ['prod', 'pull', 'push', 'sync', 'nowatch', 'noinit'],
     alias: { 'h': 'help', 'p': 'prod', 'c': 'config', 'd': 'debug', 'a': 'areas' },
     default: {
         areas: '',
+        noinit: false,
         debug: '0',
         c: 'dev',
         pull: false,
@@ -69,6 +70,7 @@ api.init()
     .then(function () {
     var apps = options.get('applications', {});
     var tables = options.get('tables', {});
+    var multifile = options.get('multifile', 'record');
     var app = null;
     var appWatcher;
     function refreshApps(cb) {
@@ -124,7 +126,12 @@ api.init()
     }
     // init lists for first time
     if (api.connected) {
-        initSetup();
+        if (args.noinit) {
+            console.log("You are connected but no synchronization is started.  Use command 'sync' to start synchronization.");
+        }
+        else {
+            initSetup();
+        }
     }
     else {
         console.log("You are not connected to your instance.  Please setup your connection.");

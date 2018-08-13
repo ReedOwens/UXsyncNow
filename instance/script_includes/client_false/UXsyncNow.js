@@ -24,6 +24,7 @@ UXsyncNow.prototype = {
             for (var table in tableHash) if (table === name) return true;
             return false;
         }
+
         function hasScope(table) {
             var gr = new GlideRecord(table);
             gr.initialize();
@@ -48,6 +49,9 @@ UXsyncNow.prototype = {
 
         //var ignoreTables=['sys_dictionary','sys_ui_policy', 'sys_security_acl'];
         var ignoreTables = ['sys_dictionary'];
+        var ignoreFields = {
+            'sys_script' : ['message']
+        }
         var tables = {};
         var unmappedTables = {};
         var nonApplicationTables = {};
@@ -74,6 +78,17 @@ UXsyncNow.prototype = {
                 scope: gr.sys_scope.getDisplayValue(),
                 scope_id: gr.sys_scope + ""
             };
+            if (ignoreFields[field.table] !== undefined) {
+                var ifields = ignoreFields[field.table];
+                var ifound = false;
+                for (var j=0; j<ifields.length; j++ ) {
+                    if (ifields[j] === field.name) ifound = true;
+                }
+
+                if (ifound) {
+                    continue;  // Ignore this field
+                }
+            }
             if (field.table.indexOf('var__m_') !== 0 && ignoreTables.indexOf(field.table) === -1) {
                 if (typeof tables[field.table] === 'undefined') {
                     tables[field.table] = {key: '', name: gr.name + ""};
@@ -121,6 +136,13 @@ UXsyncNow.prototype = {
             }
         }
 
+        // fill out the label for each table
+        for (table in tables) {
+            var tbl = tables[table];
+            var tlabel = new GlideRecord(tbl.name);
+            tbl.label = tlabel.getLabel();
+        }
+
 
         return ({tables: tables, tables_unmapped: unmappedTables, tables_non_application: nonApplicationTables});
     },
@@ -155,7 +177,8 @@ UXsyncNow.prototype = {
                 var nonBlankFields = [];
                 var crc = [];
                 for (var i = 0; i < fields.length; i++) {
-                    if (gr[fields[i].name].getDisplayValue() != '') {
+                    // if (gr[fields[i].name].getDisplayValue() != '') {
+                    if (!this.isBlank(gr[fields[i].name].getDisplayValue(), fields[i].type)) {
                         // have content
                         nonBlankFields.push(fields[i].name);
                         crc.push(this.crc(gr[fields[i].name].getDisplayValue()));
@@ -166,6 +189,34 @@ UXsyncNow.prototype = {
             }
         }
         return files;
+    },
+    getBlankTemplates: function (type) {
+        if (type === 'script' || type === 'script_plain' || type === 'script_server') {
+            return [
+                "function onCondition() {\n" +
+                "\n" +
+                "}",
+                // For business rules
+                "(function executeRule(current, previous /*null when async*/) {\n" +
+                "\n" +
+                "\t// Add your code here\n" +
+                "\n" +
+                "})(current, previous);"
+            ]
+        }
+        return [];
+    },
+    isBlank: function (value, type) {
+        // Check for fields with blank values so we know they have no data in them.
+        // Some fields have data but are "blank" templates.  We should ignore them too
+
+        if (value === "") return true;
+        var blanks = this.getBlankTemplates(type);
+        for (var i = 0; i < blanks.length; i++)
+            if (blanks[i] === value) {
+                return true;
+            }
+        return false;
     },
     validUserDetail: function () {
         var result = "SUCCESS";
