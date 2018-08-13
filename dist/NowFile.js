@@ -56,7 +56,6 @@ var NowFile = /** @class */ (function () {
         var basedir = options.get("base_dir", "./");
         var fileOverride = options.get("file_override", []);
         var tableDirMode = options.get("table_dir", "label").toLowerCase();
-        console.log("TableMode = " + tableDirMode);
         // Get the cached info on the local/instance crc and sync times
         // Todo: add top_dir override
         // Todo: add base_dir override
