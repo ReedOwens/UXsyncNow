@@ -46,6 +46,8 @@ To solve these issues, we've developed an internal too, **UXsyncNow**
 
 If you are upgrading from the pre-release, please read CHANGELOG.md.   There are breaking changes if you are using a previous release and steps to keep old functionality or migrate to the new functionality is documented in that file.
 
+[CHANGELOG.md](https://github.com/ReedOwens/UXsyncNow/blob/1.0/CHANGELOG.md)
+
 # Initial Setup
 
 ## Installation
