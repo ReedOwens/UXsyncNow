@@ -49,6 +49,9 @@ UXsyncNow.prototype = {
 
         //var ignoreTables=['sys_dictionary','sys_ui_policy', 'sys_security_acl'];
         var ignoreTables = ['sys_dictionary'];
+        var ignoreFields = {
+            'sys_script' : ['message']
+        }
         var tables = {};
         var unmappedTables = {};
         var nonApplicationTables = {};
@@ -75,6 +78,17 @@ UXsyncNow.prototype = {
                 scope: gr.sys_scope.getDisplayValue(),
                 scope_id: gr.sys_scope + ""
             };
+            if (ignoreFields[field.table] !== undefined) {
+                var ifields = ignoreFields[field.table];
+                var ifound = false;
+                for (var j=0; j<ifields.length; j++ ) {
+                    if (ifields[j] === field.name) ifound = true;
+                }
+
+                if (ifound) {
+                    continue;  // Ignore this field
+                }
+            }
             if (field.table.indexOf('var__m_') !== 0 && ignoreTables.indexOf(field.table) === -1) {
                 if (typeof tables[field.table] === 'undefined') {
                     tables[field.table] = {key: '', name: gr.name + ""};
@@ -120,6 +134,13 @@ UXsyncNow.prototype = {
                     delete tables[table];
                 }
             }
+        }
+
+        // fill out the label for each table
+        for (table in tables) {
+            var tbl = tables[table];
+            var tlabel = new GlideRecord(tbl.name);
+            tbl.label = tlabel.getLabel();
         }
 
 
@@ -172,7 +193,6 @@ UXsyncNow.prototype = {
     getBlankTemplates: function (type) {
         if (type === 'script' || type === 'script_plain' || type === 'script_server') {
             return [
-                // For UI Policies
                 "function onCondition() {\n" +
                 "\n" +
                 "}",

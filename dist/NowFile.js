@@ -55,6 +55,8 @@ var NowFile = /** @class */ (function () {
         var topDir = options.get("top_dir", "instance");
         var basedir = options.get("base_dir", "./");
         var fileOverride = options.get("file_override", []);
+        var tableDirMode = options.get("table_dir", "label").toLowerCase();
+        console.log("TableMode = " + tableDirMode);
         // Get the cached info on the local/instance crc and sync times
         // Todo: add top_dir override
         // Todo: add base_dir override
@@ -70,6 +72,13 @@ var NowFile = /** @class */ (function () {
         }
         else {
             var recordName = _recordName.replace(/[\\\/]/gm, '_');
+            var tableName = _tableName;
+            if (tableDirMode === "label") {
+                if (table['label'] != undefined) {
+                    tableName = table.label;
+                    tableName = tableName.replace(/[\\\/]/gm, '_');
+                }
+            }
             var field = lodash_1.find(table.fields, { name: this._fieldName });
             if (!field) {
                 console.log("ERROR: " + _fieldName + " was not found in " + _tableName);
@@ -94,7 +103,7 @@ var NowFile = /** @class */ (function () {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             recordName +
                             path.sep +
@@ -109,7 +118,7 @@ var NowFile = /** @class */ (function () {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             _fieldName +
                             path.sep +
@@ -127,7 +136,7 @@ var NowFile = /** @class */ (function () {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             recordName +
                             "_" +
@@ -142,7 +151,7 @@ var NowFile = /** @class */ (function () {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             recordName +
                             "." +

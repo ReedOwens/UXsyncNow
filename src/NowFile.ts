@@ -60,7 +60,7 @@ export class NowFile {
         let topDir = options.get("top_dir", "instance");
         let basedir = options.get("base_dir", "./");
         let fileOverride = options.get("file_override", []);
-
+        let tableDirMode = options.get( "table_dir", "label").toLowerCase();
         // Get the cached info on the local/instance crc and sync times
 
 
@@ -80,6 +80,13 @@ export class NowFile {
             mode.filesReceived++;
         } else {
             let recordName = _recordName.replace(/[\\\/]/gm, '_');
+            let tableName = _tableName;
+            if ( tableDirMode === "label") {
+                if (table['label'] != undefined)  {
+                    tableName = table.label;
+                    tableName = tableName.replace(/[\\\/]/gm, '_');
+                }
+            }
 
             let field = find(table.fields, {name: this._fieldName});
             if (!field) {
@@ -104,7 +111,7 @@ export class NowFile {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             recordName +
                             path.sep +
@@ -120,7 +127,7 @@ export class NowFile {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             _fieldName +
                             path.sep +
@@ -139,7 +146,7 @@ export class NowFile {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             recordName +
                             "_" +
@@ -155,7 +162,7 @@ export class NowFile {
                             path.sep +
                             _applicationName +
                             path.sep +
-                            _tableName +
+                            tableName +
                             path.sep +
                             recordName +
                             "." +

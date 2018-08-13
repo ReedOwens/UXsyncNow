@@ -17,7 +17,8 @@ export interface IFieldDef {
 export interface ITableDef {
     key:string,
     name:string,
-    fields: IFieldDef[]
+    fields: IFieldDef[],
+    label?:string
 }
 
 export class NowTables {
