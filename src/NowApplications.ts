@@ -34,7 +34,16 @@ export class NowApplications {
     }
 
     findBy(pred:string, value:any) {
-        return _.find(this._applications, [pred,value]);
+         //prioritize exact matches
+         let key = _.find(this._applications, function(app){
+            return app[pred].toString().toLowerCase() === value.toString().toLowerCase();
+        });
+        if(!key){
+            key = _.find(this._applications, function(app){
+                return app[pred].toString().toLowerCase().indexOf(value.toString().toLowerCase()) > -1;
+            });
+        }
+        return key;
     }
 
     static getNowApplications(): NowApplications {
