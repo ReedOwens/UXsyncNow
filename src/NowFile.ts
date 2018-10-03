@@ -370,7 +370,9 @@ export class NowFile {
                         }`
                 );
                 NowFile.debug.log(`  ${this._fileName}`);
-                this.pushFile();
+                //debounce the file push
+                let pushFile = this.pushFile.bind(this);
+                setTimeout(pushFile,100);
                 break;
             case Sync.PULL:
             case Sync.INSTANCE:
