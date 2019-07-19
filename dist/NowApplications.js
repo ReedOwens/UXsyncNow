@@ -24,7 +24,16 @@ var NowApplications = /** @class */ (function () {
         return _.find(this._applications, ['name', name]);
     };
     NowApplications.prototype.findBy = function (pred, value) {
-        return _.find(this._applications, [pred, value]);
+        //prioritize exact matches
+        var key = _.find(this._applications, function (app) {
+            return app[pred].toString().toLowerCase() === value.toString().toLowerCase();
+        });
+        if (!key) {
+            key = _.find(this._applications, function (app) {
+                return app[pred].toString().toLowerCase().indexOf(value.toString().toLowerCase()) > -1;
+            });
+        }
+        return key;
     };
     NowApplications.getNowApplications = function () {
         if (NowApplications._singleton === null)
