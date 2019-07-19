@@ -4,6 +4,12 @@ Cache-Control: no-cache
 Authorization: Basic {{username}} {{password}}
 
 ###
+GET http://{{host}}/api/global/uxsyncnow/getTables
+Accept: */*
+Cache-Control: no-cache
+Authorization: Basic {{username}} {{password}}
+
+###
 GET http://{{host}}/api/global/uxsyncnow/getApplications
 Accept: */*
 Cache-Control: no-cache

@@ -357,7 +357,9 @@ var NowFile = /** @class */ (function () {
                 // todo: push change
                 NowFile.debug.log("Save to instance " + this._tableName + ", " + this._fieldName + ", " + this._recordID);
                 NowFile.debug.log("  " + this._fileName);
-                this.pushFile();
+                //debounce the file push
+                var pushFile = this.pushFile.bind(this);
+                setTimeout(pushFile, 100);
                 break;
             case SyncMode_1.Sync.PULL:
             case SyncMode_1.Sync.INSTANCE:
