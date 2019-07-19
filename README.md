@@ -149,6 +149,7 @@ If a work area has already been setup, then all you need to do is run **uxsyncno
 | --sync                              | Uses SYNC for the sync method.  This is the default method
 | --nowatch                           | Causes the application only to process the synchronization of the work area and doesn't watch for changes on the instance or the work area.  When the synchronization is done, then the application will exit
 | --noinit                            | Connect to the instance but do not initialize the sync engine.   Use this during upgrades to connect and set options before the synchronization starts.
+| -v, --version                       | Prints out the version of UXsyncNow |
 
 # Application Command Line 
 **uxsyncnow** provides an application command line interface to interact with the application.   When the application is started you will receive a command prompt `uxsyncnow:` and can run any of the application commands via this interface.  Try `help` to get started.
