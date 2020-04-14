@@ -31,7 +31,7 @@ UXsyncNow.prototype = {
             var fields = gr.getFields();
             for (var i = 0; i < fields.size(); i++) {
                 var glideElement = fields.get(i);
-                if (glideElement.getName() == 'sys_scope') return true;
+                if (glideElement.getName() === 'sys_scope') return true;
             }
             return false;
         }
@@ -42,7 +42,7 @@ UXsyncNow.prototype = {
             var fields = gr.getFields();
             for (var i = 0; i < fields.size(); i++) {
                 var glideElement = fields.get(i);
-                if (glideElement.getName() == 'name') return true;
+                if (glideElement.getName() === 'name') return true;
             }
             return false;
         }
@@ -51,7 +51,7 @@ UXsyncNow.prototype = {
         var ignoreTables = ['sys_dictionary'];
         var ignoreFields = {
             'sys_script' : ['message']
-        }
+        };
         var tables = {};
         var unmappedTables = {};
         var nonApplicationTables = {};

@@ -9,6 +9,5 @@
         return ({status: "ERROR", message: "Invalid User"})
     }
 
-    var list = uxsyncnow.getApplications();
-    return list;
+    return uxsyncnow.getApplications();
 })(request, response);
