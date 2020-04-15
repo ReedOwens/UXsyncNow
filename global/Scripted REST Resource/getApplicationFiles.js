@@ -3,7 +3,8 @@
     var uxsyncnow = new UXsyncNow();
 
     if (!uxsyncnow.validUser()) {
-        return ({status: "ERROR", message: "Invalid User"})
+        return uxsyncnow.validUserDetail();
+//        return ({status: "ERROR", message: "Invalid User"})
     }
 
     var json = new global.JSON();
