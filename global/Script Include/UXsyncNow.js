@@ -1,6 +1,7 @@
 var UXsyncNow = Class.create();
 UXsyncNow.prototype = {
     initialize: function () {
+        this.ignoreFields = ['sys_updated_on'];
     },
     getApplications: function () {
         var gr = new GlideRecord('sys_app');
@@ -339,5 +340,79 @@ UXsyncNow.prototype = {
         }
     },
 
+    getApplicationExtendedTables: function () {
+        var table = new TableUtils('sys_metadata');
+        var ret = table.getTableExtensions();
+        var size = ret.size();
+
+        var tbls = [];
+
+        for (var i = 0; i < size; i++) { tbls.push(ret.get(i) + '') }
+
+        this.tables = tbls;
+
+        return tbls;
+    },
+    getRecordCRC: function (gr) {
+        var flds = {};
+        var str = '';
+        var fields = gr.getFields();
+        var crc32 = new UXCRC32();
+        for (var i = 0; i < fields.size(); i++) {
+            var glideElement = fields.get(i);
+            if (glideElement.hasValue()) {
+                flds[glideElement.getName()] = crc32.computeString(glideElement + '');
+                str += glideElement.getName() + ':' + glideElement;
+            }
+        }
+        var record = {record: crc32.computeString(str), fields: flds};
+        return record;
+    },
+    getAppRecords: function (application) {
+        var appGr = new GlideRecord('sys_app');
+        var version = 'unknown';
+        if (appGr.get(application)) {
+            version = appGr.version + '';
+        }
+        var records = [];
+        for (var i = 0; i < this.tables.length; i++) {
+            var table = this.tables[i];
+            var gr = new GlideRecord(table);
+            gr.addQuery('sys_scope', '=', application);
+            gr.query();
+            while (gr.next()) {
+                var record = {
+                    table: table,
+                    sys_id: gr.sys_id + '',
+                    display: gr.getDisplayValue(),
+                    crc: this.getRecordCRC(gr),
+                    references: this.getReferenceFields(gr)
+                };
+                records.push(record);
+            }
+        }
+        return {version: version, records: records };
+    },
+
+    getReferenceFields: function(current) {
+        var table = current.getTableName();
+        var fields = {};
+
+        var gr = new GlideRecord('sys_dictionary');
+        gr.addQuery('name', '=',table);
+        gr.addQuery('internal_type', '=', 'reference');
+        gr.query();
+        while (gr.next()) {
+            var name = gr.element + '';
+            var field = {
+                name: name,
+                display: gr.column_label + '',
+                reference: current[name].sys_id + '',
+                reference_table: gr.reference + ''
+            };
+            fields[name] = field;
+        }
+        return fields;
+    },
     type: 'UXsyncNow'
 };
